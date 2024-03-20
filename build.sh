@@ -1,1 +1,1 @@
-g++ -o bin/main.exe src/main.cpp src/prioritized.cpp src/a_star.cpp -std=c++17 -I include
+g++ -o bin/main.exe src/main.cpp src/prioritized.cpp src/a_star.cpp src/heuristics.cpp -std=c++20 -I include

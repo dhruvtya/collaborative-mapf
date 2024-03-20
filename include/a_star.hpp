@@ -1,3 +1,6 @@
+#ifndef A_STAR_HPP
+#define A_STAR_HPP
+
 #include "iostream"
 
 using namespace std;
@@ -17,3 +20,5 @@ class AStar{
         ~AStar(){};
     
 };
+
+#endif // A_STAR_HPP
