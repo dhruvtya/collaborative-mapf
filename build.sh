@@ -1,0 +1,1 @@
+g++ -o bin/main.exe src/main.cpp src/prioritized.cpp src/a_star.cpp -std=c++17 -I include
