@@ -8,6 +8,7 @@
 
 #include "a_star.hpp"
 #include "heuristics.hpp"
+#include "utils.hpp"
 
 using namespace std;
 using namespace std::chrono;
