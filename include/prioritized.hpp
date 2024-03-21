@@ -10,6 +10,7 @@
 #include "heuristics.hpp"
 
 using namespace std;
+using namespace std::chrono;
 
 enum class AgentType{
     TRANSIT = 0,
@@ -42,6 +43,7 @@ class PrioritizedPlanning{
         int num_transit_agents_;
         int num_helper_agents_;
         priority_queue<Agent> agents_queue_;
+        queue<Agent> solved_agents_;
 
         // Functions
         void printPriorityQueue();

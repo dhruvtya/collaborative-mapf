@@ -17,6 +17,7 @@ PrioritizedPlanning::PrioritizedPlanning(vector<vector<int>> map,
                                         : map_{map}, starts_{starts}, goals_{goals}, helper_parking_{helper_parking}{
     
     num_transit_agents_ = goals_.size();
+    agents_queue_ = priority_queue<Agent>();
 
     // Build prioritiy queue & Compute heuristics
     for(int i = 0; i < num_transit_agents_; i++){
@@ -42,10 +43,39 @@ void PrioritizedPlanning::printPriorityQueue(){
 
 void PrioritizedPlanning::solve(){
     cout << "Solving prioritized planning" << endl;
+    solved_agents_ = queue<Agent>();
 
-    // Test adding helper agent
-    agents_queue_.emplace(1, AgentType::HELPER, helper_parking_, helper_parking_);
+    // Start timer
+    auto start_time = high_resolution_clock::now();
 
-    // Print priority queue
-    printPriorityQueue();
+    // Loop to find path for each agent
+    while(!agents_queue_.empty()){
+        // Get agent with highest priority
+        Agent agent = agents_queue_.top();
+        agents_queue_.pop();
+
+        // Find path for agent
+
+        // If a clean path is found, remove agent from queue and add to solved agents
+
+        // If a path with movable obstacles is found, add higher priority helper agents and continue loop
+
+        // If no path is found, return failure
+
+        // Add constraints for lower priority agents
+
+    }
+
+    // End timer
+    auto end_time = high_resolution_clock::now();
+    auto computation_time = duration_cast<milliseconds>(end_time - start_time);
+    
+    // Metrics
+    cout << "Found solution ----------" << endl;
+    cout << "| Comp. time: " << computation_time.count() / 1000 << "s\t|" << endl;
+    cout << "| Sum of costs: " /* TODO */ << "\t|" << endl;
+    cout << "-------------------------" << endl;
+
+    // Save solution
+    // TODO
 }
