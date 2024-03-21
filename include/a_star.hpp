@@ -5,20 +5,12 @@
 
 using namespace std;
 
-class AStar{
-    private:
-        // Variables
-        int a;
-
-        // Functions
-
-    public:
-        // Constructor
-        AStar();
-
-        // Destructor
-        ~AStar(){};
+namespace AStar{
+    // Add any more functions and variables if needed
     
-};
+    void buildConstraintTable();
+
+    void findAStarPath();
+}
 
 #endif // A_STAR_HPP
