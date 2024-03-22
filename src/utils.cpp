@@ -115,6 +115,17 @@ void utils::printMap(const vector<vector<int>> &map, vector<pair<int, int>> &sta
     cout << "-----------------------------" << endl;
 }
 
+void utils::printHeuristicMap(const vector<vector<int>> &map){
+    cout << "-----------------------------" << endl;
+    for(int i = 0; i < map.size(); i++){
+        for(int j = 0; j < map[i].size(); j++){
+            cout << map[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << "-----------------------------" << endl;
+}
+
 void utils::saveSolution(){
 
 }
