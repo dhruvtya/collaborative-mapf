@@ -2,15 +2,57 @@
 #define A_STAR_HPP
 
 #include "iostream"
+#include "unordered_map"
+#include "algorithm"
+#include "heuristics.hpp"
 
 using namespace std;
 
-namespace AStar{
-    // Add any more functions and variables if needed
-    
-    void buildConstraintTable();
+// Constraints
+struct Constraint{
+    int agent_id;
+    vector<pair<int, int>> location;
+    int time_step;
+};
 
-    void findAStarPath();
+typedef unordered_map<int, vector<Constraint>> ConstraintTable;
+
+namespace AStar{
+    struct Node {
+        pair<int, int> location;
+        float g_value;
+        float h_value;
+        shared_ptr<Node> parent;
+        int time_step;
+
+        Node(Node& node)
+            : location{node.location}, g_value{node.g_value}, h_value{node.h_value}, parent{node.parent}, time_step{node.time_step}{}
+
+        Node(pair<int, int> location, float g_value, float h_value, shared_ptr<Node> parent, int time_step)
+            : location{location}, g_value{g_value}, h_value{h_value}, parent{parent}, time_step{time_step}{}
+
+        float f_value() const{
+            return g_value + h_value;
+        }
+    };
+
+    struct CompareNodes
+    {
+        bool operator() (shared_ptr<Node> lhs, shared_ptr<Node> rhs) const
+        {
+            return lhs->f_value() > rhs->f_value();
+        }
+    };
+    
+    void buildConstraintTable(const vector<Constraint>& constraints, const int& agent_id, unordered_map<int, vector<Constraint>>& constraint_table);
+
+    bool inMap(const pair<int, int>& location, const int& x_size, const int& y_size);
+
+    bool isConstrained(const pair<int, int>& curr_location, const pair<int, int>& next_location, const int& next_time, const ConstraintTable& constraint_table);
+
+    void getPath(const shared_ptr<Node>& current_node, vector<pair<int, int>>& path);
+
+    void findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const vector<Constraint>& constraints, vector<pair<int, int>>& path);
 }
 
 #endif // A_STAR_HPP
