@@ -25,7 +25,7 @@ namespace utils{
     void printMap(const vector<vector<int>> &map, vector<pair<int, int>> &starts, vector<pair<int, int>> &goals, pair<int, int> &helper_parking);
     void printHeuristicMap(const vector<vector<int>> &map);
     void printResults(const vector<Result> &results);
-    void saveSolution();
+    void saveSolution(const vector<Result> &results, string filename);
 }
 
 #endif // UTILS_HPP

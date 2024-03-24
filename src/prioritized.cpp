@@ -43,7 +43,7 @@ void PrioritizedPlanning::printPriorityQueue(){
     }
 }
 
-void PrioritizedPlanning::solve(){
+vector<Result> PrioritizedPlanning::solve(){
     cout << "Solving prioritized planning" << endl;
     solved_agents_ = queue<Agent>();
     vector<Constraint> constraints;
@@ -98,7 +98,7 @@ void PrioritizedPlanning::solve(){
         else{
             // If no path is found, return failure
             cout << "No path found for agent " << agent.id_ << endl;
-            return;
+            return vector<Result>();
         }
 
         // If a path with movable obstacles is found, add higher priority helper agents and continue loop
@@ -115,7 +115,8 @@ void PrioritizedPlanning::solve(){
     cout << "| Sum of costs: " /* TODO */ << "\t|" << endl;
     cout << "-------------------------" << endl;
 
-    // Save solution
+    // Print result
     utils::printResults(results);
-    // TODO
+    
+    return results;
 }

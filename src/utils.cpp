@@ -147,6 +147,21 @@ void utils::printResults(const vector<Result> &results){
     cout << "================================" << endl;
 }
         
-void utils::saveSolution(){
+void utils::saveSolution(const vector<Result> &results, string filename){
+    ofstream file;
 
+    file.open("output/" + filename + ".csv");
+    
+    for(const auto &result : results){
+        file << result.agent_id_ << "," << (int)result.type_ << "," << result.start_.first << "," << result.start_.second << "," << result.goal_.first << "," << result.goal_.second << ",";
+        for(int i = 0; i < result.path_.size(); i++){
+            file << result.path_[i].first << "," << result.path_[i].second;
+            if(i != result.path_.size() - 1){
+                file << ",";
+            }
+        }
+        file << "\n";
+    }
+
+    file.close();
 }

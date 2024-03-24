@@ -20,7 +20,12 @@ int main(int argc, char* argv[]){
 
     // Call prioritized planning
     PrioritizedPlanning p(map, starts, goals, helper_parking);
-    p.solve();
+    vector<Result> results = p.solve();
+
+    // Save results
+    if(!results.empty()){
+        utils::saveSolution(results, string(argv[1]));
+    }
 
     return 0;
 }

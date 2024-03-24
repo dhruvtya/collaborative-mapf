@@ -53,7 +53,7 @@ class PrioritizedPlanning{
         ~PrioritizedPlanning(){};
     
         // Functions
-        void solve();
+        vector<Result> solve();
 };
 
 #endif // PRIORITIZED_HPP
