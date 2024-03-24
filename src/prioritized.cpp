@@ -1,7 +1,7 @@
 #include "prioritized.hpp"
 
-Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal)
-                            : id_{id}, type_{type}, start_{start}, goal_{goal}{}
+Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics)
+                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}{}
 
 bool Agent::operator<(const Agent& other) const{
     return this->id_ > other.id_;
@@ -22,7 +22,9 @@ PrioritizedPlanning::PrioritizedPlanning(vector<vector<int>> map,
     // Build prioritiy queue & Compute heuristics
     for(int i = 0; i < num_transit_agents_; i++){
         // TODO : Compute heuristics
-        agents_queue_.emplace(10 * i + 10, AgentType::TRANSIT, starts_[i], goals_[i]);
+        vector<vector<int>> heuristics;
+        computeHeuristics(map_, goals_[i], heuristics);
+        agents_queue_.emplace(10 * i + 10, AgentType::TRANSIT, starts_[i], goals_[i], heuristics);
     }
 
     // Print priority queue
@@ -44,6 +46,8 @@ void PrioritizedPlanning::printPriorityQueue(){
 void PrioritizedPlanning::solve(){
     cout << "Solving prioritized planning" << endl;
     solved_agents_ = queue<Agent>();
+    vector<Constraint> constraints;
+    vector<Result> results;
 
     // Start timer
     auto start_time = high_resolution_clock::now();
@@ -55,14 +59,49 @@ void PrioritizedPlanning::solve(){
         agents_queue_.pop();
 
         // Find path for agent
+        vector<pair<int, int>> path;
+        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, constraints, path);
 
         // If a clean path is found, remove agent from queue and add to solved agents
+        if(!path.empty()){
+            // Add results
+            results.emplace_back(Result{agent.id_, agent.type_, agent.start_, agent.goal_, path});
+            solved_agents_.push(agent);
+
+            // Add constraints for lower priority agents
+            priority_queue<Agent> temp_queue = agents_queue_;
+            while(!temp_queue.empty()){
+                Agent temp_agent = temp_queue.top();
+                temp_queue.pop();
+                if(temp_agent.id_ != agent.id_){
+                    for(int i = 0; i < path.size(); i++){
+                        vector<pair<int, int>> temp_path;
+                        temp_path.push_back(path[i]);
+                        constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
+                    }
+                    for(int i = 0; i < path.size() - 1; i++){
+                        vector<pair<int, int>> temp_path;
+                        temp_path.push_back(path[i]);
+                        temp_path.push_back(path[i+1]);
+                        constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
+                    }
+                    if(path.size() < time_horizon_){
+                        for(int i = path.size(); i < time_horizon_; i++){
+                            vector<pair<int, int>> temp_path;
+                            temp_path.push_back(path.back());
+                            constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            // If no path is found, return failure
+            cout << "No path found for agent " << agent.id_ << endl;
+            return;
+        }
 
         // If a path with movable obstacles is found, add higher priority helper agents and continue loop
-
-        // If no path is found, return failure
-
-        // Add constraints for lower priority agents
 
     }
 
@@ -77,5 +116,6 @@ void PrioritizedPlanning::solve(){
     cout << "-------------------------" << endl;
 
     // Save solution
+    utils::printResults(results);
     // TODO
 }

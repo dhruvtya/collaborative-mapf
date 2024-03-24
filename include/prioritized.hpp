@@ -13,11 +13,6 @@
 using namespace std;
 using namespace std::chrono;
 
-enum class AgentType{
-    TRANSIT = 0,
-    HELPER = 1
-};
-
 class Agent{
     public:
         // Variables
@@ -25,11 +20,11 @@ class Agent{
         AgentType type_;
         pair<int, int> start_;
         pair<int, int> goal_;
-        // TODO: Add heuristics
+        vector<vector<int>> heuristics_;
 
         // Functions
         bool operator<(const Agent& other) const;
-        Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal);
+        Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics);
         bool operator==(const Agent& other) const;
 };
 
@@ -45,6 +40,7 @@ class PrioritizedPlanning{
         int num_helper_agents_;
         priority_queue<Agent> agents_queue_;
         queue<Agent> solved_agents_;
+        int time_horizon_ = 120;
 
         // Functions
         void printPriorityQueue();

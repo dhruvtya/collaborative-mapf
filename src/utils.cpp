@@ -126,6 +126,27 @@ void utils::printHeuristicMap(const vector<vector<int>> &map){
     cout << "-----------------------------" << endl;
 }
 
+void utils::printResults(const vector<Result> &results){
+    cout << "Printing results ===============" << endl;
+    for(int i = 0; i < results.size(); i++){
+        cout << "Agent ID: " << results[i].agent_id_ << endl;
+        cout << "Type: " << ((int)results[i].type_?"Helper":"Transit") << endl;
+        cout << "Start: " << results[i].start_.first << " " << results[i].start_.second << endl;
+        cout << "Goal: " << results[i].goal_.first << " " << results[i].goal_.second << endl;
+        cout << "Path: ";
+        for(int j = 0; j < results[i].path_.size(); j++){
+            cout << "(" << results[i].path_[j].first << ", " << results[i].path_[j].second << ") ";
+        }
+        if(i != results.size() - 1){
+            cout << "\n ----------" << endl;
+        }
+        else{
+            cout << endl;
+        }
+    }
+    cout << "================================" << endl;
+}
+        
 void utils::saveSolution(){
 
 }
