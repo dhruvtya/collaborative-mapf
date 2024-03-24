@@ -60,18 +60,18 @@ vector<Result> PrioritizedPlanning::solve(){
         // Find path for agent
         vector<pair<int, int>> path;
         vector<pair<int, int>> movable_obstacles;
+
         if(agent.type_ == AgentType::TRANSIT){
-            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, constraints, path, movable_obstacles, agent.type_);
+            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, constraints, path, movable_obstacles);
         }
         else{
             // If agent is helper, find path to goal and back to parking
             vector<pair<int, int>> path1, path2;
-            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, constraints, path1, movable_obstacles, agent.type_);
-            AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, constraints, path2, movable_obstacles, agent.type_);
+            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, constraints, path1, movable_obstacles);
+            AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, agent.type_, constraints, path2, movable_obstacles);
             path = path1;
             path.insert(path.end(), path2.begin(), path2.end());
         }
-        
 
         // If a path is found, check if there are any movable obstacles
         if(!path.empty()){
