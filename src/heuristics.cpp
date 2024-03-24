@@ -43,7 +43,7 @@ void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuris
         Node curr_node = open_list.top();
         open_list.pop();
         // int distance = heuristic_map[curr_node.x][curr_node.y];
-        
+
         if (visited[curr_node.x][curr_node.y]) {
             continue;
         } else {
@@ -54,7 +54,11 @@ void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuris
 
         for (auto move:valid_moves_2d) {
             Node new_node = {curr_node.x + move.first, curr_node.y + move.second, curr_node.dist + 1};
-            
+
+            if (new_node.x < 0 || new_node.x >= x_size || new_node.y < 0 || new_node.y >= y_size) {
+                continue;
+            }
+
             bool has_obstacle = (obstacle_map[new_node.x][new_node.y] == -1);
 
             if (has_obstacle || visited[new_node.x][new_node.y]) {

@@ -40,7 +40,7 @@ class PrioritizedPlanning{
         int num_helper_agents_;
         priority_queue<Agent> agents_queue_;
         queue<Agent> solved_agents_;
-        int time_horizon_ = 120;
+        int time_horizon_ = 10;
 
         // Functions
         void printPriorityQueue();

@@ -56,7 +56,6 @@ vector<Result> PrioritizedPlanning::solve(){
     while(!agents_queue_.empty()){
         // Get agent with highest priority
         Agent agent = agents_queue_.top();
-        agents_queue_.pop();
 
         // Find path for agent
         vector<pair<int, int>> path;
@@ -67,30 +66,30 @@ vector<Result> PrioritizedPlanning::solve(){
             // Add results
             results.emplace_back(Result{agent.id_, agent.type_, agent.start_, agent.goal_, path});
             solved_agents_.push(agent);
+            agents_queue_.pop();
 
             // Add constraints for lower priority agents
             priority_queue<Agent> temp_queue = agents_queue_;
             while(!temp_queue.empty()){
                 Agent temp_agent = temp_queue.top();
                 temp_queue.pop();
-                if(temp_agent.id_ != agent.id_){
-                    for(int i = 0; i < path.size(); i++){
+                
+                for(int i = 0; i < path.size(); i++){
+                    vector<pair<int, int>> temp_path;
+                    temp_path.push_back(path[i]);
+                    constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
+                }
+                for(int i = 0; i < path.size() - 1; i++){
+                    vector<pair<int, int>> temp_path;
+                    temp_path.push_back(path[i]);
+                    temp_path.push_back(path[i+1]);
+                    constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i + 1});
+                }
+                if(path.size() < time_horizon_){
+                    for(int i = path.size(); i < time_horizon_; i++){
                         vector<pair<int, int>> temp_path;
-                        temp_path.push_back(path[i]);
+                        temp_path.push_back(path.back());
                         constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
-                    }
-                    for(int i = 0; i < path.size() - 1; i++){
-                        vector<pair<int, int>> temp_path;
-                        temp_path.push_back(path[i]);
-                        temp_path.push_back(path[i+1]);
-                        constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
-                    }
-                    if(path.size() < time_horizon_){
-                        for(int i = path.size(); i < time_horizon_; i++){
-                            vector<pair<int, int>> temp_path;
-                            temp_path.push_back(path.back());
-                            constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
-                        }
                     }
                 }
             }

@@ -58,7 +58,9 @@ bool AStar::isConstrained(const pair<int, int>& curr_location, const pair<int, i
                 return true;
             }
             if (constraint.location.size() > 1) {
-                return (constraint.location[0] == curr_location && constraint.location[1] == next_location);
+                if(constraint.location[0] == curr_location && constraint.location[1] == next_location){
+                    return true;
+                }
             }
         }
     }
@@ -102,7 +104,9 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
     int earliest_goal_time_step = 0;
     for (auto constraint:constraints) {
         if (constraint.agent_id == agent_id && constraint.location[0] == goal) {
-            earliest_goal_time_step = constraint.time_step;
+            if(constraint.time_step > earliest_goal_time_step){
+                earliest_goal_time_step = constraint.time_step;
+            }
         }
     }
 
