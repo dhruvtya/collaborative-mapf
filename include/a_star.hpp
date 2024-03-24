@@ -5,6 +5,7 @@
 #include "unordered_map"
 #include "algorithm"
 #include "heuristics.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -52,7 +53,7 @@ namespace AStar{
 
     void getPath(const shared_ptr<Node>& current_node, vector<pair<int, int>>& path);
 
-    void findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const vector<Constraint>& constraints, vector<pair<int, int>>& path);
+    void findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles, AgentType agent_type);
 }
 
 #endif // A_STAR_HPP

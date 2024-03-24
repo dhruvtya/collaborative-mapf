@@ -93,7 +93,7 @@ void AStar::getPath(const shared_ptr<Node>& current_node, vector<pair<int, int>>
  * @param constraints 
  * @param path 
  */
-void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const vector<Constraint>& constraints, vector<pair<int, int>>& path){
+void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles, AgentType agent_type){
     cout << "Finding A* path" << endl;
 
     // Build constraint table

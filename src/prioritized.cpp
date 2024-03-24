@@ -59,39 +59,50 @@ vector<Result> PrioritizedPlanning::solve(){
 
         // Find path for agent
         vector<pair<int, int>> path;
-        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, constraints, path);
+        vector<pair<int, int>> movable_obstacles;
 
-        // If a clean path is found, remove agent from queue and add to solved agents
+        // TODO : Make changes to A* calls to handle helper agents 
+        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, constraints, path, movable_obstacles, agent.type_);
+
+        // If a path is found, check if there are any movable obstacles
         if(!path.empty()){
-            // Add results
-            results.emplace_back(Result{agent.id_, agent.type_, agent.start_, agent.goal_, path});
-            solved_agents_.push(agent);
-            agents_queue_.pop();
+            // If there are no movable obstacles in the path
+            if(movable_obstacles.empty() || agent.type_ == AgentType::HELPER){
+                // Remove agent from queue and add to solved agents
+                // Add results
+                results.emplace_back(Result{agent.id_, agent.type_, agent.start_, agent.goal_, path});
+                solved_agents_.push(agent);
+                agents_queue_.pop();
 
-            // Add constraints for lower priority agents
-            priority_queue<Agent> temp_queue = agents_queue_;
-            while(!temp_queue.empty()){
-                Agent temp_agent = temp_queue.top();
-                temp_queue.pop();
-                
-                for(int i = 0; i < path.size(); i++){
-                    vector<pair<int, int>> temp_path;
-                    temp_path.push_back(path[i]);
-                    constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
-                }
-                for(int i = 0; i < path.size() - 1; i++){
-                    vector<pair<int, int>> temp_path;
-                    temp_path.push_back(path[i]);
-                    temp_path.push_back(path[i+1]);
-                    constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i + 1});
-                }
-                if(path.size() < time_horizon_){
-                    for(int i = path.size(); i < time_horizon_; i++){
+                // Add constraints for lower priority agents
+                priority_queue<Agent> temp_queue = agents_queue_;
+                while(!temp_queue.empty()){
+                    Agent temp_agent = temp_queue.top();
+                    temp_queue.pop();
+                    
+                    for(int i = 0; i < path.size(); i++){
                         vector<pair<int, int>> temp_path;
-                        temp_path.push_back(path.back());
+                        temp_path.push_back(path[i]);
                         constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
                     }
+                    for(int i = 0; i < path.size() - 1; i++){
+                        vector<pair<int, int>> temp_path;
+                        temp_path.push_back(path[i]);
+                        temp_path.push_back(path[i+1]);
+                        constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i + 1});
+                    }
+                    if(path.size() < time_horizon_){
+                        for(int i = path.size(); i < time_horizon_; i++){
+                            vector<pair<int, int>> temp_path;
+                            temp_path.push_back(path.back());
+                            constraints.emplace_back(Constraint{temp_agent.id_, temp_path, i});
+                        }
+                    }
                 }
+            }
+            else{
+                // If there are movable obstacles in the path of a transit agent, add higher priority helper agents
+                // TODO
             }
         }
         else{
@@ -99,9 +110,6 @@ vector<Result> PrioritizedPlanning::solve(){
             cout << "No path found for agent " << agent.id_ << endl;
             return vector<Result>();
         }
-
-        // If a path with movable obstacles is found, add higher priority helper agents and continue loop
-
     }
 
     // End timer
