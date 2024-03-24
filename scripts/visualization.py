@@ -49,8 +49,10 @@ class Animation:
         self.patches.append(Rectangle((x_min, y_min), x_max - x_min, y_max - y_min, facecolor='none', edgecolor='gray'))
         for i in range(len(self.my_map)):
             for j in range(len(self.my_map[0])):
-                if self.my_map[i][j]:
-                    self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray'))
+                if self.my_map[i][j] == -1:
+                    self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='black', edgecolor='black'))
+                elif self.my_map[i][j] == 1:
+                    self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray', alpha=0.2))
 
         # create agents:
         self.T = 0
@@ -64,13 +66,24 @@ class Animation:
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
     
+
+        # Get number of helper agents
+        num_helpers = 0
+        for i in range(len(types)):
+            if types[i] == 1:
+                num_helpers += 1
+        helper_count = 1
+
         for i in range(len(self.paths)):
-            name = str(int(ids[i]/10))
+            name = '-1'
             if(types[i] == 0):
+                name = str(int(ids[i]/10))
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[0],
                                     edgecolor='black')
                 self.agents[i].original_face_color = Colors[0]
             else:
+                name = 'H' + str(helper_count)
+                helper_count += 1
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor='yellow',
                                     edgecolor='black')
                 self.agents[i].original_face_color = 'yellow'
@@ -82,6 +95,18 @@ class Animation:
             self.agent_names[i].set_horizontalalignment('center')
             self.agent_names[i].set_verticalalignment('center')
             self.artists.append(self.agent_names[i])
+
+        # Get movable obstacles
+        movable_obstacles = []
+        for i in range(len(self.my_map)):
+            for j in range(len(self.my_map[0])):
+                if self.my_map[i][j] == 1:
+                    mo = [i,j]
+                    movable_obstacles.append(mo)
+
+        # Draw movable obstacles only for the timesteps that no helper agents have been to the obstacle location
+        longest_path = max([len(path) for path in paths])
+                
 
         self.animation = animation.FuncAnimation(self.fig, self.animate_func,
                                                  init_func=self.init_func,
@@ -162,9 +187,11 @@ def import_mapf_instance(filename):
         my_map.append([])
         for cell in line:
             if cell == '@':
-                my_map[-1].append(True)
+                my_map[-1].append(-1)
             elif cell == '.':
-                my_map[-1].append(False)
+                my_map[-1].append(0)
+            elif cell == '~':
+                my_map[-1].append(1)
     f.close()
     return my_map
 
