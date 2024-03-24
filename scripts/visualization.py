@@ -56,13 +56,26 @@ class Animation:
         self.T = 0
         # draw goals first
         for i, goal in enumerate(self.goals):
-            self.patches.append(Rectangle((goal[0] - 0.25, goal[1] - 0.25), 0.5, 0.5, facecolor=Colors[i % len(Colors)],
-                                          edgecolor='black', alpha=0.5))
+            if(types[i] == 0):
+                self.patches.append(Rectangle((goal[0] - 0.25, goal[1] - 0.25), 0.5, 0.5, facecolor=Colors[0],
+                                            edgecolor='black', alpha=0.5))
+                # Add text of agent id at the goal
+                self.agent_names[i] = self.ax.text(goal[0], goal[1], str(int(ids[i]/10)))
+                self.agent_names[i].set_horizontalalignment('center')
+                self.agent_names[i].set_verticalalignment('center')
+    
         for i in range(len(self.paths)):
-            name = str(i)
-            self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[i % len(Colors)],
+            name = str(int(ids[i]/10))
+            if(types[i] == 0):
+                self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[0],
                                     edgecolor='black')
-            self.agents[i].original_face_color = Colors[i % len(Colors)]
+                self.agents[i].original_face_color = Colors[0]
+            else:
+                self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor='yellow',
+                                    edgecolor='black')
+                self.agents[i].original_face_color = 'yellow'
+
+            
             self.patches.append(self.agents[i])
             self.T = max(self.T, len(paths[i]) - 1)
             self.agent_names[i] = self.ax.text(starts[i][0], starts[i][1] + 0.25, name)
