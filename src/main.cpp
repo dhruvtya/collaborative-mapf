@@ -18,6 +18,10 @@ int main(){
     // Print map
     utils::printMap(map, starts, goals, helper_parking);
     
+    Map heuristic_map;
+    computeHeuristics(map, goals[0], heuristic_map);
+    utils::printHeuristicMap(heuristic_map);
+
     // Call prioritized planning
     PrioritizedPlanning p(map, starts, goals, helper_parking);
     p.solve();
