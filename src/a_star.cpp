@@ -73,13 +73,21 @@ bool AStar::isConstrained(const pair<int, int>& curr_location, const pair<int, i
  * @param current_node 
  * @param path 
  */
-void AStar::getPath(const shared_ptr<Node>& current_node, vector<pair<int, int>>& path){
+void AStar::getPath(const Map& obstacle_map, const AgentType& agent_type, const shared_ptr<Node>& current_node, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles){
+    // Clear the path and movable obstacles
+    path.clear();
+    movable_obstacles.clear();
+
     shared_ptr<Node> node = current_node;
     while (node != nullptr) {
         path.push_back(node->location);
+        // Add movable obstacles in the path
+        if(agent_type == AgentType::TRANSIT && obstacle_map[node->location.first][node->location.second] == 1){
+            movable_obstacles.push_back(node->location);
+        }
         node = node->parent;
     }
-    reverse(path.begin(), path.end());
+    std::reverse(path.begin(), path.end());
 }
 
 /**
@@ -93,8 +101,8 @@ void AStar::getPath(const shared_ptr<Node>& current_node, vector<pair<int, int>>
  * @param constraints 
  * @param path 
  */
-void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles, AgentType agent_type){
-    cout << "Finding A* path" << endl;
+void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const AgentType& agent_type, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles){
+    std::cout << "Finding A* path" << endl;
 
     // Build constraint table
     ConstraintTable constraint_table;
@@ -133,14 +141,14 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
 
         // Check if goal is reached
         if (current_node->location == goal && current_node->time_step >= earliest_goal_time_step) {
-            cout << "Goal reached" << endl;
-            getPath(current_node, path);
+            std::cout << "Goal reached" << endl;
+            getPath(obstacle_map, agent_type, current_node, path, movable_obstacles);
             return;
         }
 
         // Check if time step exceeds maximum time step
         if (current_node->time_step > max_time_step) {
-            cout << "Time step exceeded" << endl;
+            std::cout << "Time step exceeded" << endl;
             return;
         }
 
@@ -148,8 +156,13 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
         for (auto move:valid_moves_2d) {
             pair<int, int> child_location = {current_node->location.first + move.first, current_node->location.second + move.second};
 
-            // Check if new location is within bounds and not an obstacle
+            // Check if new location is within bounds or is an immovable obstacle
             if (!inMap(child_location, x_size, y_size) || obstacle_map[child_location.first][child_location.second] == -1) {
+                continue;
+            }
+
+            // Additionally, for helper agents, check if the new location is a movable obstacle unless it is the start/goal
+            if(agent_type == AgentType::HELPER && child_location != start && child_location != goal && obstacle_map[child_location.first][child_location.second] == 1){
                 continue;
             }
 
@@ -175,6 +188,6 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
         }
     }
 
-    cout << "No path found" << endl;
+    std::cout << "No path found" << endl;
     return;    
 }

@@ -62,7 +62,7 @@ vector<Result> PrioritizedPlanning::solve(){
         vector<pair<int, int>> movable_obstacles;
 
         // TODO : Make changes to A* calls to handle helper agents 
-        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, constraints, path, movable_obstacles, agent.type_);
+        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, constraints, path, movable_obstacles);
 
         // If a path is found, check if there are any movable obstacles
         if(!path.empty()){
