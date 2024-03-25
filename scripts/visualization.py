@@ -54,6 +54,13 @@ class Animation:
                 elif self.my_map[i][j] == 1:
                     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray', alpha=0.2))
 
+        # Get number of helper agents
+        num_helpers = 0
+        for i in range(len(types)):
+            if types[i] == 1:
+                num_helpers += 1
+        helper_count = 1
+
         # create agents:
         self.T = 0
         # draw goals first
@@ -65,13 +72,15 @@ class Animation:
                 self.agent_names[i] = self.ax.text(goal[0], goal[1], str(int(ids[i]/10)))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
+            else:
+                self.patches.append(Rectangle((start[0] - 0.25, start[1] - 0.25), 0.5, 0.5, facecolor='yellow',
+                                            edgecolor='black', alpha=0.5))
+                # Add text of agent id at the goal
+                self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(helper_count))
+                self.agent_names[i].set_horizontalalignment('center')
+                self.agent_names[i].set_verticalalignment('center')
     
 
-        # Get number of helper agents
-        num_helpers = 0
-        for i in range(len(types)):
-            if types[i] == 1:
-                num_helpers += 1
         helper_count = 1
 
         for i in range(len(self.paths)):
