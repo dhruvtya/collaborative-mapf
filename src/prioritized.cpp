@@ -153,7 +153,7 @@ vector<Result> PrioritizedPlanning::solve(){
                                     }
                                     vector<pair<int, int>> temp_path;
                                     temp_path.push_back(movable_obstacles[i]);
-                                    constraints.emplace_back(Constraint{temp_agent.id_, temp_path, t, false});
+                                    constraints.emplace_back(Constraint{temp_agent.id_, temp_path, t, true});
                                 }
                             }
                         }
