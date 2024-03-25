@@ -82,7 +82,7 @@ void AStar::getPath(const Map& obstacle_map, const AgentType& agent_type, const 
     while (node != nullptr) {
         path.push_back(node->location);
         // Add movable obstacles in the path
-        if(agent_type == AgentType::TRANSIT && obstacle_map[node->location.first][node->location.second] == 1){
+        if(obstacle_map[node->location.first][node->location.second] == 1){
             movable_obstacles.push_back(node->location);
         }
         node = node->parent;
@@ -101,7 +101,10 @@ void AStar::getPath(const Map& obstacle_map, const AgentType& agent_type, const 
  * @param constraints 
  * @param path 
  */
-void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const AgentType& agent_type, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles){
+void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, 
+                            const Map& heuristic_map, int agent_id, const AgentType& agent_type, 
+                            const vector<Constraint>& constraints, vector<pair<int, int>>& path, 
+                            vector<pair<int, int>>& movable_obstacles, int starting_time_step){
     std::cout << "Finding A* path" << endl;
 
     // Build constraint table

@@ -14,6 +14,7 @@ struct Constraint{
     int agent_id;
     vector<pair<int, int>> location;
     int time_step;
+    bool for_movable_obstacle;
 };
 
 typedef unordered_map<int, vector<Constraint>> ConstraintTable;
@@ -53,7 +54,7 @@ namespace AStar{
 
     void getPath(const Map& obstacle_map, const AgentType& agent_type, const shared_ptr<Node>& current_node, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles);
 
-    void findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const AgentType& agent_type, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles);
+    void findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const AgentType& agent_type, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles, int starting_time_step);
 }
 
 #endif // A_STAR_HPP

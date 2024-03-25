@@ -1,6 +1,6 @@
 #include "utils.hpp"
 
-bool utils::loadMap(string &filename, vector<vector<int>> &map, vector<pair<int, int>> &starts, vector<pair<int, int>> &goals, pair<int, int> &helper_parking){
+bool utils::loadMap(string &filename, vector<vector<int>> &map, vector<pair<int, int>> &starts, vector<pair<int, int>> &goals, vector<pair<int, int>> &helper_parkings){
 
     // Read file
     ifstream MyFile(filename);
@@ -52,9 +52,16 @@ bool utils::loadMap(string &filename, vector<vector<int>> &map, vector<pair<int,
 
     // Read helper parking
     getline(MyFile, line);
-    int helper_parking_row = stoi(line.substr(0, line.find(" ")));
-    int helper_parking_col = stoi(line.substr(line.find(" ") + 1, line.size()));
-    helper_parking = make_pair(helper_parking_row, helper_parking_col);
+    int num_helper_agents = stoi(line);
+
+    // Read helpers
+    helper_parkings.clear();
+    for(int i = 0; i < num_helper_agents; i++){
+        getline(MyFile, line);
+        int helper_parking_row = stoi(line.substr(0, line.find(" ")));
+        int helper_parking_col = stoi(line.substr(line.find(" ") + 1, line.size()));
+        helper_parkings.push_back(make_pair(helper_parking_row, helper_parking_col));
+    }
 
     // Close file
     MyFile.close();
@@ -78,7 +85,7 @@ bool utils::loadMap(string &filename, vector<vector<int>> &map, vector<pair<int,
     return true;
 }
 
-void utils::printMap(const vector<vector<int>> &map, vector<pair<int, int>> &starts, vector<pair<int, int>> &goals, pair<int, int> &helper_parking){
+void utils::printMap(const vector<vector<int>> &map, vector<pair<int, int>> &starts, vector<pair<int, int>> &goals, vector<pair<int, int>> &helper_parkings){
     cout << "-----------------------------" << endl;
     
     for(int i = 0; i < map.size(); i++){
@@ -111,7 +118,10 @@ void utils::printMap(const vector<vector<int>> &map, vector<pair<int, int>> &sta
     }
     cout << endl;
 
-    cout << "Helper parking: (" << helper_parking.first << ", " << helper_parking.second << ")" << endl;
+    cout << "Num. of helper agents: " << helper_parkings.size() << endl;
+    for(int i = 0; i < helper_parkings.size(); i++){
+        cout << "Helper "<< i + 1 << ": (" << helper_parkings[i].first << ", " << helper_parkings[i].second << ")" << endl;
+    }
     cout << "-----------------------------" << endl;
 }
 

@@ -50,7 +50,7 @@ class Animation:
         for i in range(len(self.my_map)):
             for j in range(len(self.my_map[0])):
                 if self.my_map[i][j] == -1:
-                    self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='black', edgecolor='black'))
+                    self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray'))
                 elif self.my_map[i][j] == 1:
                     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray', alpha=0.2))
 

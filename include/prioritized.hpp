@@ -34,20 +34,21 @@ class PrioritizedPlanning{
         vector<vector<int>> map_;
         vector<pair<int, int>> starts_;
         vector<pair<int, int>> goals_;
-        pair<int, int> helper_parking_;
+        vector<pair<int, int>> helper_parkings_;
         
         int num_transit_agents_;
         int num_helper_agents_;
         priority_queue<Agent> agents_queue_;
-        queue<Agent> solved_agents_;
+        vector<Agent> solved_agents_;
         int time_horizon_ = 120;
 
         // Functions
         void printPriorityQueue();
+        bool isAgentAllowedThroughMO(const Agent &agent, const vector<pair<int, int>> &path, const vector<Constraint> &constraints, const vector<pair<int, int>> &movable_obstacles);
 
     public:
         // Constructor
-        PrioritizedPlanning(vector<vector<int>> map, vector<pair<int, int>> starts, vector<pair<int, int>> goals, pair<int, int> helper_parking);
+        PrioritizedPlanning(vector<vector<int>> map, vector<pair<int, int>> starts, vector<pair<int, int>> goals, vector<pair<int, int>> helper_parkings);
 
         // Destructor
         ~PrioritizedPlanning(){};
