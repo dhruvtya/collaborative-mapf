@@ -72,14 +72,15 @@ class Animation:
                 self.agent_names[i] = self.ax.text(goal[0], goal[1], str(int(ids[i]/10)))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
-            else:
+        for i, start in enumerate(self.starts):
+            if(types[i] == 1):
                 self.patches.append(Rectangle((start[0] - 0.25, start[1] - 0.25), 0.5, 0.5, facecolor='yellow',
                                             edgecolor='black', alpha=0.5))
                 # Add text of agent id at the goal
                 self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(helper_count))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
-    
+                helper_count += 1
 
         helper_count = 1
 
