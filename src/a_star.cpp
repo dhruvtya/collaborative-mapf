@@ -112,7 +112,7 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
     buildConstraintTable(constraints, agent_id, constraint_table);
 
     // Earliest goal time step
-    int earliest_goal_time_step = 0;
+    int earliest_goal_time_step = starting_time_step;
     for (auto constraint:constraints) {
         if (constraint.agent_id == agent_id && constraint.location[0] == goal) {
             if(constraint.time_step > earliest_goal_time_step){
@@ -123,7 +123,7 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
 
     // Initialize open list
     priority_queue<shared_ptr<Node>, vector<shared_ptr<Node>>, CompareNodes> open_list;
-    shared_ptr<Node> root_node = make_shared<Node>(start, 0, heuristic_map[start.first][start.second], nullptr, 0);
+    shared_ptr<Node> root_node = make_shared<Node>(start, 0, heuristic_map[start.first][start.second], nullptr, starting_time_step);
     open_list.push(root_node);
 
     // Initialize closed list

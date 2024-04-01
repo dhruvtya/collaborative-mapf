@@ -205,8 +205,22 @@ vector<Result> PrioritizedPlanning::solve(){
                         for(int i = 0; i < movable_obstacles.size(); i++){
                             vector<vector<int>> heuristics;
                             computeHeuristics(map_, movable_obstacles[i], heuristics);
-                            agents_queue_.emplace(agent.id_ - 9 + i, AgentType::HELPER, helper_parkings_[helpers_used_], movable_obstacles[i], heuristics);
+                            int helper_id = agent.id_ - 9 + i;
+                            agents_queue_.emplace(helper_id, AgentType::HELPER, helper_parkings_[helpers_used_], movable_obstacles[i], heuristics);
                             helpers_used_++;
+
+                            // Add already existing constraints for the newly added helper agent
+                            vector<Constraint> temp_constraints = constraints;
+
+                            for(auto constraint:constraints){
+                                if(constraint.agent_id == agent.id_){
+                                    temp_constraints.emplace_back(Constraint{helper_id, constraint.location, constraint.time_step, constraint.for_movable_obstacle});
+                                }
+                            }
+
+                            for(auto constraint:temp_constraints){
+                                constraints.emplace_back(constraint);
+                            }
                         }
                     }
                 }
