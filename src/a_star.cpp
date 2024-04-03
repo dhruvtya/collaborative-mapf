@@ -123,7 +123,7 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
                             const Map& heuristic_map, int agent_id, const AgentType& agent_type, 
                             const vector<Constraint>& constraints, vector<pair<int, int>>& path, 
                             vector<pair<int, int>>& movable_obstacles, int starting_time_step){
-    std::cout << "Finding A* path" << endl;
+    // std::cout << "Finding A* path" << endl;
 
     // Build constraint table
     ConstraintTable constraint_table;
@@ -166,7 +166,6 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
 
         // Check if goal is reached
         if (current_node->location == goal && current_node->time_step >= earliest_goal_time_step) {
-            std::cout << "Goal reached" << endl;
             getPath(obstacle_map, agent_type, current_node, path, movable_obstacles);
             return;
         }

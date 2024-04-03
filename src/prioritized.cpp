@@ -98,7 +98,7 @@ vector<Result> PrioritizedPlanning::solve(){
             vector<pair<int, int>> path1, path2;
             AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, constraints, path1, movable_obstacles, 0);
             if(path1.empty()){
-                cout << "No path found for agent " << agent.id_ << endl;
+                cout << "\nNo path found for agent " << agent.id_ << endl;
                 return vector<Result>();
             }
             AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, agent.type_, constraints, path2, movable_obstacles, (int)path1.size() - 1);
@@ -115,6 +115,8 @@ vector<Result> PrioritizedPlanning::solve(){
                 results.emplace_back(Result{agent.id_, agent.type_, agent.start_, agent.goal_, path});
                 solved_agents_.push_back(agent);
                 agents_queue_.pop();
+
+                cout << "\rAgents planned: " << solved_agents_.size() << "/" << num_transit_agents_ + helpers_used_ << flush;
 
                 // Add constraints for lower priority agents
                 priority_queue<Agent> temp_queue = agents_queue_;
@@ -167,6 +169,8 @@ vector<Result> PrioritizedPlanning::solve(){
                     solved_agents_.push_back(agent);
                     agents_queue_.pop();
 
+                    cout << "\rAgents planned: " << solved_agents_.size() << "/" << num_transit_agents_ + helpers_used_ << flush;
+
                     // Add constraints for lower priority agents
                     priority_queue<Agent> temp_queue = agents_queue_;
                     while(!temp_queue.empty()){
@@ -197,7 +201,7 @@ vector<Result> PrioritizedPlanning::solve(){
                     // If there are movable obstacles in the path of a transit agent, add higher priority helper agents
                     // Can only accomodate 9 helper agents per transit agent
                     if(movable_obstacles.size() > 9 || movable_obstacles.size() + helpers_used_ > helper_parkings_.size()){
-                        cout << "Too many movable obstacles in the path of agent " << agent.id_ << endl;
+                        cout << "\nToo many movable obstacles in the path of agent " << agent.id_ << endl;
                         return vector<Result>();
                     }
                     else{
@@ -230,7 +234,7 @@ vector<Result> PrioritizedPlanning::solve(){
         }
         else{
             // If no path is found, return failure
-            cout << "No path found for agent " << agent.id_ << endl;
+            cout << "\nNo path found for agent " << agent.id_ << endl;
             return vector<Result>();
         }
     }
@@ -240,13 +244,13 @@ vector<Result> PrioritizedPlanning::solve(){
     auto computation_time = duration_cast<milliseconds>(end_time - start_time);
     
     // Metrics
-    cout << "Found solution ----------" << endl;
-    cout << "| Comp. time: " << computation_time.count() / 1000 << "s\t|" << endl;
+    cout << "\nFound solution ----------" << endl;
+    cout << "| Comp. time: " << duration_cast<milliseconds>(end_time - start_time).count() << "ms\t|" << endl;
     cout << "| Sum of costs: " /* TODO */ << "\t|" << endl;
     cout << "-------------------------" << endl;
 
     // Print result
-    utils::printResults(results);
+    // utils::printResults(results);
     
     return results;
 }
