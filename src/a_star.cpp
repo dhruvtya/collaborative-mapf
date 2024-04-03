@@ -28,6 +28,24 @@ void AStar::buildConstraintTable(const vector<Constraint>& constraints, const in
     }
 }
 
+void AStar::buildMOHelperConstraintTable(const vector<Constraint>& constraints, const int& agent_id, ConstraintTable& constraint_table){
+    // Clear the constraint table
+    constraint_table.clear();
+
+    // Add constraints to the constraint table
+    for (auto constraint:constraints) {
+        if (constraint.agent_id == agent_id && constraint.for_movable_obstacle) {
+            if (constraint_table.find(constraint.time_step) == constraint_table.end()) {
+                vector<Constraint> constraint_list;
+                constraint_list.push_back(constraint);
+                constraint_table[constraint.time_step] = constraint_list;
+            } else {
+                constraint_table[constraint.time_step].push_back(constraint);
+            }
+        }
+    }
+}
+
 /**
  * @brief Check if a location is within the map bounds
  * 
@@ -110,6 +128,10 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
     // Build constraint table
     ConstraintTable constraint_table;
     buildConstraintTable(constraints, agent_id, constraint_table);
+    ConstraintTable mo_helper_constraint_table;
+    if(agent_type == AgentType::HELPER){
+        buildMOHelperConstraintTable(constraints, agent_id, mo_helper_constraint_table);
+    }
 
     // Earliest goal time step
     int earliest_goal_time_step = starting_time_step;
@@ -166,7 +188,19 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
 
             // Additionally, for helper agents, check if the new location is a movable obstacle unless it is the start/goal
             if(agent_type == AgentType::HELPER && child_location != start && child_location != goal && obstacle_map[child_location.first][child_location.second] == 1){
-                continue;
+                // Check if helper agent is allowed to move through movable obstacle at this time step (has the obstacle been moved?)
+                if(mo_helper_constraint_table.find(current_node->time_step) != mo_helper_constraint_table.end()){
+                    bool allowed = false;
+                    for(auto constraint:mo_helper_constraint_table.at(current_node->time_step)){
+                        if(constraint.location[0] == child_location){
+                            allowed = true;
+                            break;
+                        }
+                    }
+                    if(!allowed){
+                        continue;
+                    }
+                }
             }
 
             // Check if new location is in constraint table

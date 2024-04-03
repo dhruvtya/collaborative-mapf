@@ -21,7 +21,6 @@ PrioritizedPlanning::PrioritizedPlanning(vector<vector<int>> map,
 
     // Build prioritiy queue & Compute heuristics
     for(int i = 0; i < num_transit_agents_; i++){
-        // TODO : Compute heuristics
         vector<vector<int>> heuristics;
         computeHeuristics(map_, goals_[i], heuristics);
         agents_queue_.emplace(10 * i + 10, AgentType::TRANSIT, starts_[i], goals_[i], heuristics);
@@ -202,6 +201,9 @@ vector<Result> PrioritizedPlanning::solve(){
                         return vector<Result>();
                     }
                     else{
+                        // Reverse movable obstacles to get the order in which they are encountered
+                        reverse(movable_obstacles.begin(), movable_obstacles.end());
+                        
                         for(int i = 0; i < movable_obstacles.size(); i++){
                             vector<vector<int>> heuristics;
                             computeHeuristics(map_, movable_obstacles[i], heuristics);

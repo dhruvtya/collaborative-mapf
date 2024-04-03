@@ -48,13 +48,23 @@ namespace AStar{
     
     void buildConstraintTable(const vector<Constraint>& constraints, const int& agent_id, unordered_map<int, vector<Constraint>>& constraint_table);
 
+    void buildMOHelperConstraintTable(const vector<Constraint>& constraints, const int& agent_id, unordered_map<int, vector<Constraint>>& constraint_table);
+
     bool inMap(const pair<int, int>& location, const int& x_size, const int& y_size);
 
     bool isConstrained(const pair<int, int>& curr_location, const pair<int, int>& next_location, const int& next_time, const ConstraintTable& constraint_table);
 
     void getPath(const Map& obstacle_map, const AgentType& agent_type, const shared_ptr<Node>& current_node, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles);
 
-    void findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, const Map& heuristic_map, int agent_id, const AgentType& agent_type, const vector<Constraint>& constraints, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles, int starting_time_step);
+    void findAStarPath(const Map& obstacle_map, 
+                        const pair<int, int>& start, 
+                        const pair<int, int>& goal, 
+                        const Map& heuristic_map, 
+                        int agent_id, const AgentType& agent_type, 
+                        const vector<Constraint>& constraints, 
+                        vector<pair<int, int>>& path, 
+                        vector<pair<int, int>>& movable_obstacles, 
+                        int starting_time_step);
 }
 
 #endif // A_STAR_HPP
