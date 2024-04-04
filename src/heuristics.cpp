@@ -16,7 +16,6 @@ public:
 };
 
 void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuristic_map){
-    cout << "Computing heuristics" << endl;
 
     int x_size = obstacle_map.size();
     int y_size = obstacle_map[0].size();
@@ -24,8 +23,6 @@ void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuris
     vector<vector<bool>> visited;
 
     // heuristics
-
-    // TODO: Implement this function
     for (int i = 0; i < x_size; i++) {
         vector<int> heuristic_initialize(y_size, INT32_MAX);
         vector<bool> visited_initialize(y_size, false);
@@ -42,7 +39,6 @@ void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuris
     while (!open_list.empty()) {
         Node curr_node = open_list.top();
         open_list.pop();
-        // int distance = heuristic_map[curr_node.x][curr_node.y];
 
         if (visited[curr_node.x][curr_node.y]) {
             continue;
@@ -68,6 +64,4 @@ void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuris
             open_list.push(new_node);
         }
     }
-
-    cout << "Done computing heuristics.";
 }

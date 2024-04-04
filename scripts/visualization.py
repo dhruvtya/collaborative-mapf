@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib import animation
 import csv
 
-Colors = ['green', 'blue', 'orange']
+Colors = ['green', 'blue', 'orange', 'yellow']
 
 
 class Animation:
@@ -49,8 +49,17 @@ class Animation:
         self.patches.append(Rectangle((x_min, y_min), x_max - x_min, y_max - y_min, facecolor='none', edgecolor='gray'))
         for i in range(len(self.my_map)):
             for j in range(len(self.my_map[0])):
-                if self.my_map[i][j]:
+                if self.my_map[i][j] == -1:
                     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray'))
+                # elif self.my_map[i][j] == 1:
+                #     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray', alpha=0.2))
+
+        # Get number of helper agents
+        num_helpers = 0
+        for i in range(len(types)):
+            if types[i] == 1:
+                num_helpers += 1
+        helper_count = 1
 
         # create agents:
         self.T = 0
@@ -63,18 +72,36 @@ class Animation:
                 self.agent_names[i] = self.ax.text(goal[0], goal[1], str(int(ids[i]/10)))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
-    
+        for i, start in enumerate(self.starts):
+            if(types[i] == 1):
+                self.patches.append(Rectangle((start[0] - 0.25, start[1] - 0.25), 0.5, 0.5, facecolor=Colors[3],
+                                            edgecolor='black', alpha=0.5))
+                # Add text of agent id at the goal
+                self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(helper_count))
+                self.agent_names[i].set_horizontalalignment('center')
+                self.agent_names[i].set_verticalalignment('center')
+                helper_count += 1
+
+        helper_count = 1
+
         for i in range(len(self.paths)):
-            name = str(int(ids[i]/10))
+            name = '-1'
             if(types[i] == 0):
+                name = str(int(ids[i]/10))
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[0],
                                     edgecolor='black')
                 self.agents[i].original_face_color = Colors[0]
-            else:
-                self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor='yellow',
+            elif(types[i] == 1):
+                name = 'H' + str(helper_count)
+                helper_count += 1
+                self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[3],
                                     edgecolor='black')
-                self.agents[i].original_face_color = 'yellow'
-
+                self.agents[i].original_face_color = Colors[3]
+            else:
+                name = ''
+                self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.35, facecolor='gray', edgecolor='black', alpha=0.2)
+                # self.agents[i] = Rectangle((starts[i][1] - 0.5, starts[i][0] - 0.5), 1, 1, facecolor='gray', edgecolor='gray', alpha=0.2)
+                self.agents[i].original_face_color = 'gray'
             
             self.patches.append(self.agents[i])
             self.T = max(self.T, len(paths[i]) - 1)
@@ -82,6 +109,18 @@ class Animation:
             self.agent_names[i].set_horizontalalignment('center')
             self.agent_names[i].set_verticalalignment('center')
             self.artists.append(self.agent_names[i])
+
+        # Get movable obstacles
+        # movable_obstacles = []
+        # for i in range(len(self.my_map)):
+        #     for j in range(len(self.my_map[0])):
+        #         if self.my_map[i][j] == 1:
+        #             mo = [i,j]
+        #             movable_obstacles.append(mo)
+
+        # Draw movable obstacles only for the timesteps that no helper agents have been to the obstacle location
+        # longest_path = max([len(path) for path in paths])
+                
 
         self.animation = animation.FuncAnimation(self.fig, self.animate_func,
                                                  init_func=self.init_func,
@@ -125,7 +164,7 @@ class Animation:
                 d2 = agents_array[j]
                 pos1 = np.array(d1.center)
                 pos2 = np.array(d2.center)
-                if np.linalg.norm(pos1 - pos2) < 0.7:
+                if np.linalg.norm(pos1 - pos2) < 0.7 and not ((types[i] == 1 and types[j] == 2) or (types[i] == 2 and types[j] == 1)):
                     d1.set_facecolor('red')
                     d2.set_facecolor('red')
                     print("COLLISION! (agent-agent) ({}, {}) at time {}".format(i, j, t/10))
@@ -162,9 +201,11 @@ def import_mapf_instance(filename):
         my_map.append([])
         for cell in line:
             if cell == '@':
-                my_map[-1].append(True)
+                my_map[-1].append(-1)
             elif cell == '.':
-                my_map[-1].append(False)
+                my_map[-1].append(0)
+            elif cell == '~':
+                my_map[-1].append(1)
     f.close()
     return my_map
 
@@ -201,6 +242,35 @@ if __name__ == '__main__':
     my_map = import_mapf_instance(file)
 
     ids, types, starts, goals, paths = import_results(file)
+
+    # Add movable obstacles as agents with different type
+    for i in range(len(my_map)):
+        for j in range(len(my_map[0])):
+            if my_map[i][j] == 1:
+                ids.append(ids[-1] + 1)
+                types.append(2)
+                starts.append((i, j))
+                # find which helper agent reaches the movable obstacle first
+                first_helper = -1
+                helper_timestep = -1
+                for k in range(len(paths)):
+                    if types[k] == 1 and (i,j) in paths[k] and (paths[k].index((i,j)) < helper_timestep or helper_timestep == -1):
+                        first_helper = k
+                        helper_timestep = paths[k].index((i,j))
+                # If no helper agent reaches the obstacle, keep goal same as start and make the entire path at the start location
+                if first_helper == -1:
+                    goals.append((i,j))
+                    paths.append([(i,j)] * len(paths[0]))
+                else:
+                    goals.append(goals[first_helper])
+                    path = []
+                    # Keep movable obstacle at the same location until the helper agent reaches the obstacle
+                    for k in range(helper_timestep):
+                        path.append((i,j))
+                    # Add the rest of the path
+                    for k in range(helper_timestep, len(paths[first_helper])):
+                        path.append(paths[first_helper][k])
+                    paths.append(path)
 
     print("***Test paths on a simulation***")
     animation = Animation(my_map, starts, goals, paths)
