@@ -1,15 +1,5 @@
 #include "a_star.hpp"
 
-#define GETMAPINDEX(X, Y, T, XSIZE, YSIZE) (T * XSIZE * YSIZE + (Y - 1) * XSIZE + (X - 1))
-
-
-/**
- * @brief Build the constraint table for a given agent for A* search
- * 
- * @param constraints - List of constraints
- * @param agent_id - ID of the agent for which the constraint table is being built
- * @param constraint_table - Reference to the constraint table [Return]
- */
 void AStar::buildConstraintTable(const vector<Constraint>& constraints, const int& agent_id, ConstraintTable& constraint_table){
     // Clear the constraint table
     constraint_table.clear();
@@ -46,31 +36,14 @@ void AStar::buildMOHelperConstraintTable(const vector<Constraint>& constraints, 
     }
 }
 
-/**
- * @brief Check if a location is within the map bounds
- * 
- * @param location 
- * @param x_size 
- * @param y_size 
- * @return true 
- * @return false 
- */
 bool AStar::inMap(const pair<int, int>& location, const int& x_size, const int& y_size){
     return (location.first >= 0 && location.first < x_size && location.second >= 0 && location.second < y_size);
 }
 
-/**
- * @brief Check if a move is constrained by the constraint table
- * 
- * @param curr_location 
- * @param next_location 
- * @param next_time 
- * @param constraint_table 
- * @return true 
- * @return false 
- */
 bool AStar::isConstrained(const pair<int, int>& curr_location, const pair<int, int>& next_location, const int& next_time, const ConstraintTable& constraint_table){
+    // Check if there is a constraint at the next time step
     if (constraint_table.find(next_time) != constraint_table.end()) {
+        // Check if the next location is in the constraint table
         for (auto constraint:constraint_table.at(next_time)) {
             if (constraint.location[0] == next_location) {
                 return true;
@@ -85,12 +58,6 @@ bool AStar::isConstrained(const pair<int, int>& curr_location, const pair<int, i
     return false;
 }
 
-/**
- * @brief Get the path from the current node
- * 
- * @param current_node 
- * @param path 
- */
 void AStar::getPath(const Map& obstacle_map, const AgentType& agent_type, const shared_ptr<Node>& current_node, vector<pair<int, int>>& path, vector<pair<int, int>>& movable_obstacles){
     // Clear the path and movable obstacles
     path.clear();
@@ -105,25 +72,13 @@ void AStar::getPath(const Map& obstacle_map, const AgentType& agent_type, const 
         }
         node = node->parent;
     }
-    std::reverse(path.begin(), path.end());
+    reverse(path.begin(), path.end());
 }
 
-/**
- * @brief Find the A* path
- * 
- * @param obstacle_map 
- * @param start 
- * @param goal 
- * @param heuristic_map 
- * @param agent_id 
- * @param constraints 
- * @param path 
- */
 void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, const pair<int, int>& goal, 
                             const Map& heuristic_map, int agent_id, const AgentType& agent_type, 
                             const vector<Constraint>& constraints, vector<pair<int, int>>& path, 
                             vector<pair<int, int>>& movable_obstacles, int starting_time_step){
-    // std::cout << "Finding A* path" << endl;
 
     // Build constraint table
     ConstraintTable constraint_table;

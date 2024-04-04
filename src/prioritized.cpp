@@ -4,10 +4,12 @@ Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, 
                             : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}{}
 
 bool Agent::operator<(const Agent& other) const{
+    // Agents with lower ID have higher priority
     return this->id_ > other.id_;
 }
 
 bool Agent::operator==(const Agent& other) const{
+    // Agents are equal if they have the same ID, Type, Start and Goal locations
     return (this->type_ == other.type_ && this->start_ == other.start_ && this->goal_ == other.goal_);
 }
 
@@ -31,6 +33,7 @@ PrioritizedPlanning::PrioritizedPlanning(vector<vector<int>> map,
 }
 
 void PrioritizedPlanning::printPriorityQueue(){
+    // Print priority queue
     cout << "Printing priority queue" << endl;
     priority_queue<Agent> temp_queue = agents_queue_;
     while(!temp_queue.empty()){
