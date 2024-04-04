@@ -234,14 +234,17 @@ def import_results(filename):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Runs various MAPF algorithms')
+    parser.add_argument('--solver', type=str, default=None,
+                        help='The solver type')
     parser.add_argument('--instance', type=str, default=None,
                         help='The name of the instance file(s)')
     
     args = parser.parse_args()
-    file = args.instance
-    my_map = import_mapf_instance(file)
+    map_file = args.instance
+    result_file = args.solver + "_" + args.instance
+    my_map = import_mapf_instance(map_file)
 
-    ids, types, starts, goals, paths = import_results(file)
+    ids, types, starts, goals, paths = import_results(result_file)
 
     # Add movable obstacles as agents with different type
     for i in range(len(my_map)):

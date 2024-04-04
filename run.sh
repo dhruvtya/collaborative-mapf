@@ -1,2 +1,2 @@
-./bin/main.exe $1
-python3 scripts/visualization.py --instance $1
+./bin/main.exe $1 $2
+python3 scripts/visualization.py --solver $1 --instance $2

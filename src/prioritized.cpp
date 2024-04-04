@@ -1,17 +1,5 @@
 #include "prioritized.hpp"
 
-Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics)
-                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}{}
-
-bool Agent::operator<(const Agent& other) const{
-    // Agents with lower ID have higher priority
-    return this->id_ > other.id_;
-}
-
-bool Agent::operator==(const Agent& other) const{
-    // Agents are equal if they have the same ID, Type, Start and Goal locations
-    return (this->type_ == other.type_ && this->start_ == other.start_ && this->goal_ == other.goal_);
-}
 
 PrioritizedPlanning::PrioritizedPlanning(vector<vector<int>> map, 
                                         vector<pair<int, int>> starts, 

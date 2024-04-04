@@ -15,46 +15,6 @@ using namespace std::chrono;
 
 
 /**
- * @brief Class to represent an Agent
-*/
-class Agent{
-    public:
-        // Variables
-        int id_;
-        AgentType type_;
-        pair<int, int> start_;
-        pair<int, int> goal_;
-        vector<vector<int>> heuristics_;
-
-        /**
-         * @brief Overload the < operator for the priority queue
-         * 
-         * @param other Reference to the other agent being compared with
-         * @return True if the agent is less than the other agent, False otherwise
-        */
-        bool operator<(const Agent& other) const;
-
-        /**
-         * @brief Construct a new Agent object
-         * 
-         * @param id Agent ID
-         * @param type Agent Type
-         * @param start Agent Start Location
-         * @param goal Agent Goal Location
-         * @param heuristics Agent Heuristics
-        */
-        Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics);
-
-        /**
-         * @brief Overload the == operator for the priority queue
-         * 
-         * @param other Reference to the other agent being compared with
-         * @return True if the agents are equal, False otherwise
-        */
-        bool operator==(const Agent& other) const;
-};
-
-/**
  * @brief Class to handle the Prioritized Planning
 */
 class PrioritizedPlanning{
