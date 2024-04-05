@@ -116,6 +116,20 @@ namespace utils{
      * @param filename The name of the file
     */
     void saveSolution(const vector<Result> &results, string filename);
+
+    /**
+     * @brief (Overloaded) Get the sum of costs of the paths
+     * 
+     * @param paths The paths to be summed
+    */
+    double getSumOfCosts(const vector<vector<pair<int, int>>> &paths);
+
+    /**
+     * @brief (Overloaded) Get the sum of costs of the paths
+     * 
+     * @param results The results to be summed
+    */
+    double getSumOfCosts(const vector<Result> &results);
 }
 
 #endif // UTILS_HPP

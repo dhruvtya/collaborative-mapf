@@ -188,3 +188,19 @@ void utils::saveSolution(const vector<Result> &results, string filename){
 
     file.close();
 }
+
+double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths){
+    double sum = 0;
+    for(const auto &path : paths){
+        sum += path.size();
+    }
+    return sum;
+}
+
+double utils::getSumOfCosts(const vector<Result> &results){
+    double sum = 0;
+    for(const auto &result : results){
+        sum += result.path_.size();
+    }
+    return sum;
+}
