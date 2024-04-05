@@ -117,15 +117,54 @@ vector<Result> CBS::solve(){
     cout << "Solving CBS planning" << endl;
     
     vector<Result> results;
-    int helpers_used_ = 0;
     long unsigned int visited_nodes = 0;
 
     // Start timer
     auto start_time = high_resolution_clock::now();
 
-    // TODO: Find movable objects in the paths of the agents
+    // Find movable objects in the paths of the agents
+    set<int> helpers_used;
+    set<int> helpers_unused;
+    vector<Agent> helper_agents_list;
+    for(int i = 0; i < helper_parkings_.size(); i++){
+        helpers_unused.insert(i);
+    }
+    for(auto &agent : agents_list_){
+        vector<pair<int, int>> path;
+        vector<pair<int, int>> movable_obstacles;
+        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, vector<Constraint>(), path, movable_obstacles, 0);
+        
+        // Assign the closest helper for each movable obstacle
+        for(auto &obstacle : movable_obstacles){
+            int min_distance = numeric_limits<int>::max();
+            int helper_id = -1;
 
-    // TODO: Assign the closest helper for each movable obstacle
+            for(auto &helper : helpers_unused){
+                if(utils::getManhattanDistance(helper_parkings_[helper], obstacle) < min_distance){
+                    min_distance = utils::getManhattanDistance(helper_parkings_[helper], obstacle);
+                    helper_id = helper;
+                }
+            }
+
+            if(helper_id != -1){
+                helpers_used.insert(helper_id);
+                helpers_unused.erase(helper_id);
+            }
+            else{
+                cout << "Not enough helpers" << endl;
+                return results;
+            }
+            
+            vector<vector<int>> heuristics;
+            computeHeuristics(map_, helper_parkings_[helper_id], heuristics);
+            helper_agents_list.emplace_back(num_transit_agents_ + helpers_used.size() - 1, AgentType::HELPER, helper_parkings_[helper_id], obstacle, heuristics);
+        }
+    }
+
+    // Add helper agents to the main agents list
+    for(auto &helper : helper_agents_list){
+        agents_list_.push_back(helper);
+    }
 
     // Solve CBS for the entire fleet
     // Initialize the constraint tree search
@@ -138,7 +177,22 @@ vector<Result> CBS::solve(){
     for(const auto &agent : agents_list_){
         vector<pair<int, int>> path;
         vector<pair<int, int>> movable_obstacles;
-        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, vector<Constraint>(), path, movable_obstacles, 0);
+        // If agent is transit, find path to goal
+        if(agent.type_ == AgentType::TRANSIT){
+            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, vector<Constraint>(), path, movable_obstacles, 0);
+        }
+        else{
+            // If agent is helper, find path to goal and back to parking
+            vector<pair<int, int>> path1, path2;
+            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, vector<Constraint>(), path1, movable_obstacles, 0);
+            if(path1.empty()){
+                cout << "\nNo path found for agent " << agent.id_ << endl;
+                return vector<Result>();
+            }
+            AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, agent.type_, vector<Constraint>(), path2, movable_obstacles, (int)path1.size() - 1);
+            path = path1;
+            path.insert(path.end(), path2.begin(), path2.end());
+        }
         root->paths[agent.id_] = path;
     }
     // Get the sum of costs
@@ -180,16 +234,47 @@ vector<Result> CBS::solve(){
             // Find the path for the agent with the constraint
             vector<pair<int, int>> path;
             vector<pair<int, int>> movable_obstacles;
-            AStar::findAStarPath(map_, 
-                                agents_list_[constraint.agent_id].start_, 
-                                agents_list_[constraint.agent_id].goal_, 
-                                agents_list_[constraint.agent_id].heuristics_, 
-                                constraint.agent_id, 
-                                agents_list_[constraint.agent_id].type_, 
-                                child_node->constraints, 
-                                path, 
-                                movable_obstacles, 
-                                0);
+            if(agents_list_[constraint.agent_id].type_ == AgentType::TRANSIT){
+                AStar::findAStarPath(map_, 
+                                    agents_list_[constraint.agent_id].start_, 
+                                    agents_list_[constraint.agent_id].goal_, 
+                                    agents_list_[constraint.agent_id].heuristics_, 
+                                    constraint.agent_id, 
+                                    agents_list_[constraint.agent_id].type_, 
+                                    child_node->constraints, 
+                                    path, 
+                                    movable_obstacles, 
+                                    0);
+            }
+            else{
+                vector<pair<int, int>> path1, path2;
+                AStar::findAStarPath(map_, 
+                                    agents_list_[constraint.agent_id].start_, 
+                                    agents_list_[constraint.agent_id].goal_, 
+                                    agents_list_[constraint.agent_id].heuristics_, 
+                                    constraint.agent_id, 
+                                    agents_list_[constraint.agent_id].type_, 
+                                    child_node->constraints, 
+                                    path1, 
+                                    movable_obstacles, 
+                                    0);
+                if(path1.size() == 0){
+                    continue;
+                }
+                AStar::findAStarPath(map_, 
+                                    agents_list_[constraint.agent_id].goal_, 
+                                    agents_list_[constraint.agent_id].start_, 
+                                    agents_list_[constraint.agent_id].heuristics_, 
+                                    constraint.agent_id, 
+                                    agents_list_[constraint.agent_id].type_, 
+                                    child_node->constraints, 
+                                    path2, 
+                                    movable_obstacles, 
+                                    (int)path1.size() - 1);
+                path = path1;
+                path.insert(path.end(), path2.begin(), path2.end());
+            }
+
             if(path.size() == 0){
                 continue;
             }

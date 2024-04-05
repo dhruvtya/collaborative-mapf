@@ -204,3 +204,7 @@ double utils::getSumOfCosts(const vector<Result> &results){
     }
     return sum;
 }
+
+double utils::getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal){
+    return abs(start.first - goal.first) + abs(start.second - goal.second);
+}

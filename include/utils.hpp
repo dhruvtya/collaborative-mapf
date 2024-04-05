@@ -130,6 +130,16 @@ namespace utils{
      * @param results The results to be summed
     */
     double getSumOfCosts(const vector<Result> &results);
+
+    /**
+     * @brief Get the manhattan distance between two points
+     * 
+     * @param start The start location
+     * @param goal The goal location
+     * 
+     * @return The manhattan distance between the two points
+    */
+    double getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal);
 }
 
 #endif // UTILS_HPP
