@@ -5,6 +5,7 @@
 #include "vector"
 #include "fstream" 
 #include "memory"
+#include "set"
 
 using namespace std;
 
@@ -130,6 +131,14 @@ namespace utils{
      * @param results The results to be summed
     */
     double getSumOfCosts(const vector<Result> &results);
+
+    /**
+     * @brief (Overloaded) Get the sum of costs of the paths
+     * 
+     * @param paths The paths to be summed
+     * @param map The map of the environment
+    */
+    double getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const vector<vector<int>> &map);
 
     /**
      * @brief Get the manhattan distance between two points

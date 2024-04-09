@@ -54,12 +54,13 @@ class Animation:
 
         # Get number of helper agents
         num_helpers = 0
+        num_transits = 0
         for i in range(len(types)):
+            if types[i] == 0:
+                num_transits += 1
             if types[i] == 1:
                 num_helpers += 1
         helper_count = 1
-
-        num_transits = len(starts) - num_helpers
 
         # create agents:
         self.T = 0
@@ -72,7 +73,7 @@ class Animation:
                 if(solver == 'prioritized'):
                     self.agent_names[i] = self.ax.text(goal[0], goal[1], str(int(ids[i]/10)))
                 else:
-                    self.agent_names[i] = self.ax.text(goal[0], goal[1], str(ids[i]))
+                    self.agent_names[i] = self.ax.text(goal[0], goal[1], str(ids[i] + 1))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
         for i, start in enumerate(self.starts):
@@ -83,7 +84,7 @@ class Animation:
                 if(solver == 'prioritized'):
                     self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(helper_count))
                 else:
-                    self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(ids[i - num_transits]))
+                    self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(ids[i] - num_transits + 1))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
                 helper_count += 1
@@ -96,7 +97,7 @@ class Animation:
                 if(solver == 'prioritized'):
                     name = str(int(ids[i]/10))
                 else:
-                    name = str(ids[i])
+                    name = str(ids[i] + 1)
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[0],
                                     edgecolor='black')
                 self.agents[i].original_face_color = Colors[0]
@@ -104,7 +105,7 @@ class Animation:
                 if(solver == 'prioritized'):
                     name = 'H' + str(helper_count)
                 else:
-                    name = 'H' + str(ids[i - num_transits])
+                    name = 'H' + str(ids[i] - num_transits + 1)
                 helper_count += 1
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[3],
                                     edgecolor='black')

@@ -94,7 +94,7 @@ vector<Result> PrioritizedPlanning::solve(){
             }
             AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, agent.type_, constraints, path2, movable_obstacles, (int)path1.size() - 1);
             path = path1;
-            path.insert(path.end(), path2.begin(), path2.end());
+            path.insert(path.end(), path2.begin() + 1, path2.end());
         }
 
         // If a path is found, check if there are any movable obstacles
@@ -237,7 +237,7 @@ vector<Result> PrioritizedPlanning::solve(){
     // Metrics
     cout << "\nFound solution ----------" << endl;
     cout << "| Comp. time: " << duration_cast<milliseconds>(end_time - start_time).count() << "ms\t|" << endl;
-    cout << "| Sum of costs: " /* TODO */ << "\t|" << endl;
+    cout << "| Sum of costs: " << utils::getSumOfCosts(results) << "\t|" << endl;
     cout << "-------------------------" << endl;
 
     // Print result

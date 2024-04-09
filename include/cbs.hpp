@@ -13,13 +13,20 @@
 using namespace std;
 using namespace std::chrono;
 
+/**
+ * @brief Struct for a collision
+ */
 struct Collision{
     int agent1;
     int agent2;
     vector<pair<int, int>> loc;
     int timestep;
+    bool for_movable_obstacle = false;
 };
 
+/**
+ * @brief Struct for a node in the constraint tree
+ */
 struct CTNode{
     double cost;
     vector<Constraint> constraints;
@@ -27,6 +34,9 @@ struct CTNode{
     vector<Collision> collisions;
 };
 
+/**
+ * @brief Struct to compare the CTNode for the priority queue
+ */
 struct CompareCTNode{
     bool operator()(const shared_ptr<CTNode> &lhs, const shared_ptr<CTNode> &rhs) const{
         return lhs->cost > rhs->cost;
@@ -48,15 +58,85 @@ class CBS
         int num_transit_agents_;
         int num_helper_agents_;
         vector<Agent> agents_list_;
+        float time_horizon_ = 120;
 
+        // Functions
+        /**
+         * @brief Print the agents list
+        */
         void printAgentsList();
+
+        /**
+         * @brief Detect the first collision for a pair of agents
+         * 
+         * @param path1 The path of the first agent
+         * @param path2 The path of the second agent
+         * @param agent1 The ID of the first agent
+         * @param agent2 The ID of the second agent
+         * 
+         * @return The collision detected
+        */
         Collision detectFirstCollisionForPair(const vector<pair<int, int>> &path1, const vector<pair<int, int>> &path2, int agent1, int agent2);
+
+        /**
+         * @brief Detect collisions for all pairs of agents
+         * 
+         * @param paths The paths of all agents
+         * @param collisions Reference for the collisions detected to be returned
+        */
         void detectCollisions(const vector<vector<pair<int, int>>> &paths, vector<Collision> &collisions);
+
+        /**
+         * @brief Generate constraints for the collision
+         * 
+         * @param collision The collision detected
+         * 
+         * @return The constraints generated
+        */
         vector<Constraint> generateConstraints(const Collision &collision);
 
+        /**
+         * @brief Generate Movable Obstacle constraints for helper agents
+         * 
+         * @param helper_agents_list The list of helper agents
+         * 
+         * @return The constraints generated
+         * 
+        */
+        vector<Constraint> generateHelperMOConstraints(const vector<Agent> &helper_agents_list);
+
+        /**
+         * @brief Generate Movable Obstacle constraints for transit agents
+         * 
+         * @param helper_results The results of the helper agents
+         * 
+         * @return The constraints generated
+         * 
+         * @note The helper agents should be solved before calling this function
+        */
+        vector<Constraint> generateTransitMOConstraints(const vector<Result> &helper_results);
+
     public:
+        /**
+         * @brief Constructer for CBS class
+         * 
+         * @param map The map of the environment
+         * @param starts The starting locations of the agents
+         * @param goals The goal locations of the agents
+         * @param helper_parkings The helper agents parkings
+        */
         CBS(vector<vector<int>> map, vector<pair<int, int>> starts, vector<pair<int, int>> goals, vector<pair<int, int>> helper_parkings);
+
+        /**
+         * @brief Destructor for CBS class
+        */
         ~CBS(){}
+        
+        /**
+         * @brief Solve the CBS problem
+         * 
+         * @return The results of the CBS solver
+        */
         vector<Result> solve();
 };
 

@@ -205,6 +205,22 @@ double utils::getSumOfCosts(const vector<Result> &results){
     return sum;
 }
 
+double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const vector<vector<int>> &map){
+    double sum = getSumOfCosts(paths);
+    
+    set<pair<int, int>> visited_mo;
+    for(size_t i = 0; i < paths.size(); i++){
+        for(size_t j = 0; j < paths[i].size(); j++){
+            if(map[paths[i][j].first][paths[i][j].second] == 1 && visited_mo.find(paths[i][j]) == visited_mo.end()){
+                sum += 10;
+                visited_mo.insert(paths[i][j]);
+            }
+        }
+    }
+
+    return sum;
+}
+
 double utils::getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal){
     return abs(start.first - goal.first) + abs(start.second - goal.second);
 }

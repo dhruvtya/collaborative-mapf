@@ -166,7 +166,13 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
             
             // If a transit agent is moving through a movable obstacle, add a large cost to the g value
             if(agent_type == AgentType::TRANSIT && obstacle_map[child_location.first][child_location.second] == 1){
-                child_node->g_value += obstacle_map.size() * obstacle_map[0].size();
+                // child_node->g_value += obstacle_map.size() * obstacle_map[0].size();
+                child_node->g_value += 10;
+            }
+
+            // For any agent, add a cost of 1 for moving to a new location, to avoid unnecessary moves
+            if(child_location != current_node->location){
+                child_node->g_value += 1;
             }
             
             // Check if child node is in closed list
