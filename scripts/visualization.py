@@ -239,6 +239,10 @@ if __name__ == '__main__':
                         help='The solver type')
     parser.add_argument('--instance', type=str, default=None,
                         help='The name of the instance file(s)')
+    parser.add_argument('--record', action=argparse.BooleanOptionalAction,
+                        help='Record the animation')
+    parser.add_argument('--speed', type=float, default=1.0,
+                        help='Speed of the animation')
     
     args = parser.parse_args()
     map_file = args.instance
@@ -278,5 +282,8 @@ if __name__ == '__main__':
 
     print("***Test paths on a simulation***")
     animation = Animation(my_map, starts, goals, paths, args.solver)
-    # animation.save("output.mp4", 1.0)
+    
+    if args.record:
+        animation.save('output/' + args.solver + "_" + args.instance + '.mp4', args.speed)
+
     animation.show()
