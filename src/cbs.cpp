@@ -496,7 +496,7 @@ vector<Result> CBS::solve(){
     cout << "-------------------------" << endl;
 
     // Print result
-    utils::printResults(results);
+    // utils::printResults(results);
 
     return results;
 }

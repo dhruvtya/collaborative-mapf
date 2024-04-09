@@ -190,6 +190,5 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
         }
     }
 
-    std::cout << "No path found" << endl;
     return;    
 }
