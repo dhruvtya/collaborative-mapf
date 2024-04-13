@@ -45,6 +45,9 @@ int main(int argc, char* argv[]){
     if(!results.empty()){
         utils::saveSolution(results, string(argv[1]) + "_" + string(argv[2]));
     }
+    else{
+        return 1;
+    }
 
     return 0;
 }
