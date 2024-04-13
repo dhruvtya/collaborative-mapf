@@ -316,7 +316,7 @@ vector<Result> CBS::solve(){
             open_list.pop();
             visited_nodes++;
 
-            cout << "\rVisited helper nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << "\t" << endl;// flush;
+            cout << "\rVisited helper nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << "\t" << flush;
 
             // Check if the current node has any collisions
             if(current_node->collisions.size() == 0){
