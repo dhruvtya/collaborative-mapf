@@ -4,6 +4,8 @@
 #include "iostream"
 #include "vector"
 #include "fstream" 
+#include "memory"
+#include "set"
 
 using namespace std;
 
@@ -13,6 +15,46 @@ using namespace std;
 enum class AgentType{
     TRANSIT = 0,
     HELPER = 1
+};
+
+/**
+ * @brief Class to represent an Agent
+*/
+class Agent{
+    public:
+        // Variables
+        int id_;
+        AgentType type_;
+        pair<int, int> start_;
+        pair<int, int> goal_;
+        vector<vector<int>> heuristics_;
+
+        /**
+         * @brief Overload the < operator for the priority queue
+         * 
+         * @param other Reference to the other agent being compared with
+         * @return True if the agent is less than the other agent, False otherwise
+        */
+        bool operator<(const Agent& other) const;
+
+        /**
+         * @brief Construct a new Agent object
+         * 
+         * @param id Agent ID
+         * @param type Agent Type
+         * @param start Agent Start Location
+         * @param goal Agent Goal Location
+         * @param heuristics Agent Heuristics
+        */
+        Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics);
+
+        /**
+         * @brief Overload the == operator for the priority queue
+         * 
+         * @param other Reference to the other agent being compared with
+         * @return True if the agents are equal, False otherwise
+        */
+        bool operator==(const Agent& other) const;
 };
 
 /**
@@ -75,6 +117,38 @@ namespace utils{
      * @param filename The name of the file
     */
     void saveSolution(const vector<Result> &results, string filename);
+
+    /**
+     * @brief (Overloaded) Get the sum of costs of the paths
+     * 
+     * @param paths The paths to be summed
+    */
+    double getSumOfCosts(const vector<vector<pair<int, int>>> &paths);
+
+    /**
+     * @brief (Overloaded) Get the sum of costs of the paths
+     * 
+     * @param results The results to be summed
+    */
+    double getSumOfCosts(const vector<Result> &results);
+
+    /**
+     * @brief (Overloaded) Get the sum of costs of the paths
+     * 
+     * @param paths The paths to be summed
+     * @param map The map of the environment
+    */
+    double getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const vector<vector<int>> &map);
+
+    /**
+     * @brief Get the manhattan distance between two points
+     * 
+     * @param start The start location
+     * @param goal The goal location
+     * 
+     * @return The manhattan distance between the two points
+    */
+    double getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal);
 }
 
 #endif // UTILS_HPP

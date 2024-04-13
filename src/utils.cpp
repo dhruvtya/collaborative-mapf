@@ -1,5 +1,18 @@
 #include "utils.hpp"
 
+Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics)
+                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}{}
+
+bool Agent::operator<(const Agent& other) const{
+    // Agents with lower ID have higher priority
+    return this->id_ > other.id_;
+}
+
+bool Agent::operator==(const Agent& other) const{
+    // Agents are equal if they have the same ID, Type, Start and Goal locations
+    return (this->type_ == other.type_ && this->start_ == other.start_ && this->goal_ == other.goal_);
+}
+
 bool utils::loadMap(string &filename, vector<vector<int>> &map, vector<pair<int, int>> &starts, vector<pair<int, int>> &goals, vector<pair<int, int>> &helper_parkings){
 
     // Read file
@@ -174,4 +187,40 @@ void utils::saveSolution(const vector<Result> &results, string filename){
     }
 
     file.close();
+}
+
+double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths){
+    double sum = 0;
+    for(const auto &path : paths){
+        sum += path.size();
+    }
+    return sum;
+}
+
+double utils::getSumOfCosts(const vector<Result> &results){
+    double sum = 0;
+    for(const auto &result : results){
+        sum += result.path_.size();
+    }
+    return sum;
+}
+
+double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const vector<vector<int>> &map){
+    double sum = getSumOfCosts(paths);
+    
+    set<pair<int, int>> visited_mo;
+    for(size_t i = 0; i < paths.size(); i++){
+        for(size_t j = 0; j < paths[i].size(); j++){
+            if(map[paths[i][j].first][paths[i][j].second] == 1 && visited_mo.find(paths[i][j]) == visited_mo.end()){
+                sum += 10;
+                visited_mo.insert(paths[i][j]);
+            }
+        }
+    }
+
+    return sum;
+}
+
+double utils::getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal){
+    return abs(start.first - goal.first) + abs(start.second - goal.second);
 }

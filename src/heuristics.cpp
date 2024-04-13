@@ -1,15 +1,15 @@
 #include "heuristics.hpp"
 
-struct Node {
+struct HNode {
     int x;
     int y;
     int dist;
 };
 
-class Compare
+class CompareHNodes
 {
 public:
-    bool operator() (Node lhs, Node rhs)
+    bool operator() (HNode lhs, HNode rhs)
     {
         return lhs.dist > rhs.dist;
     }
@@ -30,14 +30,14 @@ void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuris
         visited.push_back(visited_initialize);
     }
 
-    priority_queue<Node, vector<Node>, Compare> open_list;    
+    priority_queue<HNode, vector<HNode>, CompareHNodes> open_list;    
 
     heuristic_map[goal.first][goal.second] = 0;
-    Node start_node = {goal.first, goal.second, 0};
+    HNode start_node = {goal.first, goal.second, 0};
     open_list.push(start_node);
 
     while (!open_list.empty()) {
-        Node curr_node = open_list.top();
+        HNode curr_node = open_list.top();
         open_list.pop();
 
         if (visited[curr_node.x][curr_node.y]) {
@@ -49,7 +49,7 @@ void computeHeuristics(const Map& obstacle_map, pair<int, int> goal, Map& heuris
         heuristic_map[curr_node.x][curr_node.y] = curr_node.dist;
 
         for (auto move:valid_moves_2d) {
-            Node new_node = {curr_node.x + move.first, curr_node.y + move.second, curr_node.dist + 1};
+            HNode new_node = {curr_node.x + move.first, curr_node.y + move.second, curr_node.dist + 1};
 
             if (new_node.x < 0 || new_node.x >= x_size || new_node.y < 0 || new_node.y >= y_size) {
                 continue;

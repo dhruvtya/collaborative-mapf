@@ -11,7 +11,7 @@ Colors = ['green', 'blue', 'orange', 'yellow']
 
 
 class Animation:
-    def __init__(self, my_map, starts, goals, paths):
+    def __init__(self, my_map, starts, goals, paths, solver):
         self.my_map = np.flip(np.transpose(my_map), 1)
         self.starts = []
         for start in starts:
@@ -51,12 +51,13 @@ class Animation:
             for j in range(len(self.my_map[0])):
                 if self.my_map[i][j] == -1:
                     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray'))
-                # elif self.my_map[i][j] == 1:
-                #     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='gray', edgecolor='gray', alpha=0.2))
 
         # Get number of helper agents
         num_helpers = 0
+        num_transits = 0
         for i in range(len(types)):
+            if types[i] == 0:
+                num_transits += 1
             if types[i] == 1:
                 num_helpers += 1
         helper_count = 1
@@ -69,7 +70,10 @@ class Animation:
                 self.patches.append(Rectangle((goal[0] - 0.25, goal[1] - 0.25), 0.5, 0.5, facecolor=Colors[0],
                                             edgecolor='black', alpha=0.5))
                 # Add text of agent id at the goal
-                self.agent_names[i] = self.ax.text(goal[0], goal[1], str(int(ids[i]/10)))
+                if(solver == 'prioritized'):
+                    self.agent_names[i] = self.ax.text(goal[0], goal[1], str(int(ids[i]/10)))
+                else:
+                    self.agent_names[i] = self.ax.text(goal[0], goal[1], str(ids[i] + 1))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
         for i, start in enumerate(self.starts):
@@ -77,7 +81,10 @@ class Animation:
                 self.patches.append(Rectangle((start[0] - 0.25, start[1] - 0.25), 0.5, 0.5, facecolor=Colors[3],
                                             edgecolor='black', alpha=0.5))
                 # Add text of agent id at the goal
-                self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(helper_count))
+                if(solver == 'prioritized'):
+                    self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(helper_count))
+                else:
+                    self.agent_names[i] = self.ax.text(start[0], start[1], 'H' + str(ids[i] - num_transits + 1))
                 self.agent_names[i].set_horizontalalignment('center')
                 self.agent_names[i].set_verticalalignment('center')
                 helper_count += 1
@@ -87,12 +94,18 @@ class Animation:
         for i in range(len(self.paths)):
             name = '-1'
             if(types[i] == 0):
-                name = str(int(ids[i]/10))
+                if(solver == 'prioritized'):
+                    name = str(int(ids[i]/10))
+                else:
+                    name = str(ids[i] + 1)
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[0],
                                     edgecolor='black')
                 self.agents[i].original_face_color = Colors[0]
             elif(types[i] == 1):
-                name = 'H' + str(helper_count)
+                if(solver == 'prioritized'):
+                    name = 'H' + str(helper_count)
+                else:
+                    name = 'H' + str(ids[i] - num_transits + 1)
                 helper_count += 1
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.3, facecolor=Colors[3],
                                     edgecolor='black')
@@ -100,7 +113,6 @@ class Animation:
             else:
                 name = ''
                 self.agents[i] = Circle((starts[i][0], starts[i][1]), 0.35, facecolor='gray', edgecolor='black', alpha=0.2)
-                # self.agents[i] = Rectangle((starts[i][1] - 0.5, starts[i][0] - 0.5), 1, 1, facecolor='gray', edgecolor='gray', alpha=0.2)
                 self.agents[i].original_face_color = 'gray'
             
             self.patches.append(self.agents[i])
@@ -109,17 +121,6 @@ class Animation:
             self.agent_names[i].set_horizontalalignment('center')
             self.agent_names[i].set_verticalalignment('center')
             self.artists.append(self.agent_names[i])
-
-        # Get movable obstacles
-        # movable_obstacles = []
-        # for i in range(len(self.my_map)):
-        #     for j in range(len(self.my_map[0])):
-        #         if self.my_map[i][j] == 1:
-        #             mo = [i,j]
-        #             movable_obstacles.append(mo)
-
-        # Draw movable obstacles only for the timesteps that no helper agents have been to the obstacle location
-        # longest_path = max([len(path) for path in paths])
                 
 
         self.animation = animation.FuncAnimation(self.fig, self.animate_func,
@@ -234,14 +235,21 @@ def import_results(filename):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Runs various MAPF algorithms')
+    parser.add_argument('--solver', type=str, default=None,
+                        help='The solver type')
     parser.add_argument('--instance', type=str, default=None,
                         help='The name of the instance file(s)')
+    parser.add_argument('--record', action=argparse.BooleanOptionalAction,
+                        help='Record the animation')
+    parser.add_argument('--speed', type=float, default=1.0,
+                        help='Speed of the animation')
     
     args = parser.parse_args()
-    file = args.instance
-    my_map = import_mapf_instance(file)
+    map_file = args.instance
+    result_file = args.solver + "_" + args.instance
+    my_map = import_mapf_instance(map_file)
 
-    ids, types, starts, goals, paths = import_results(file)
+    ids, types, starts, goals, paths = import_results(result_file)
 
     # Add movable obstacles as agents with different type
     for i in range(len(my_map)):
@@ -273,6 +281,9 @@ if __name__ == '__main__':
                     paths.append(path)
 
     print("***Test paths on a simulation***")
-    animation = Animation(my_map, starts, goals, paths)
-    # animation.save("output.mp4", 1.0)
+    animation = Animation(my_map, starts, goals, paths, args.solver)
+    
+    if args.record:
+        animation.save('output/' + args.solver + "_" + args.instance + '.mp4', args.speed)
+
     animation.show()

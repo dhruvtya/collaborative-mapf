@@ -1,17 +1,5 @@
 #include "prioritized.hpp"
 
-Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics)
-                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}{}
-
-bool Agent::operator<(const Agent& other) const{
-    // Agents with lower ID have higher priority
-    return this->id_ > other.id_;
-}
-
-bool Agent::operator==(const Agent& other) const{
-    // Agents are equal if they have the same ID, Type, Start and Goal locations
-    return (this->type_ == other.type_ && this->start_ == other.start_ && this->goal_ == other.goal_);
-}
 
 PrioritizedPlanning::PrioritizedPlanning(vector<vector<int>> map, 
                                         vector<pair<int, int>> starts, 
@@ -106,7 +94,7 @@ vector<Result> PrioritizedPlanning::solve(){
             }
             AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, agent.type_, constraints, path2, movable_obstacles, (int)path1.size() - 1);
             path = path1;
-            path.insert(path.end(), path2.begin(), path2.end());
+            path.insert(path.end(), path2.begin() + 1, path2.end());
         }
 
         // If a path is found, check if there are any movable obstacles
@@ -249,7 +237,7 @@ vector<Result> PrioritizedPlanning::solve(){
     // Metrics
     cout << "\nFound solution ----------" << endl;
     cout << "| Comp. time: " << duration_cast<milliseconds>(end_time - start_time).count() << "ms\t|" << endl;
-    cout << "| Sum of costs: " /* TODO */ << "\t|" << endl;
+    cout << "| Sum of costs: " << utils::getSumOfCosts(results) << "\t|" << endl;
     cout << "-------------------------" << endl;
 
     // Print result
