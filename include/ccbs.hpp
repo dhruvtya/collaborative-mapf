@@ -54,7 +54,7 @@ class CCBS
          * @param paths The paths of all agents
          * @param collisions Reference for the collisions detected to be returned
         */
-        void detectCollisions(const vector<vector<pair<int, int>>> &paths, vector<Collision> &collisions);
+        void detectCollisions(const vector<vector<pair<int, int>>> &paths, const vector<vector<pair<int, int>>> &helper_paths, vector<Collision> &collisions);
 
         /**
          * @brief Generate constraints for the collision

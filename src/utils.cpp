@@ -1,7 +1,10 @@
 #include "utils.hpp"
 
 Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics)
-                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}{}
+                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}, start_time_{0}{}
+
+Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics, int start_time)
+                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}, start_time_{start_time}{}
 
 bool Agent::operator<(const Agent& other) const{
     // Agents with lower ID have higher priority
@@ -223,4 +226,13 @@ double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const v
 
 double utils::getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal){
     return abs(start.first - goal.first) + abs(start.second - goal.second);
+}
+
+void printPath(const vector<pair<int, int>>& path) {
+    std::cout << "++++++++Printing Path++++++++++\n";
+    for (auto it:path) {
+        cout << it.first << ", " << it.second << endl;
+    }
+    std::cout << "+++++++++++++++++++++++++++++++\n";
+
 }

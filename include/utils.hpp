@@ -14,12 +14,15 @@ using namespace std;
 */
 enum class AgentType{
     TRANSIT = 0,
-    HELPER = 1
+    HELPER = 1,
+    CONVERTED_TRANSIT = 2
 };
 
 /**
  * @brief Class to represent an Agent
 */
+
+void printPath(const vector<pair<int, int>>& path);
 class Agent{
     public:
         // Variables
@@ -28,6 +31,7 @@ class Agent{
         pair<int, int> start_;
         pair<int, int> goal_;
         vector<vector<int>> heuristics_;
+        int start_time_;
 
         /**
          * @brief Overload the < operator for the priority queue
@@ -48,6 +52,17 @@ class Agent{
         */
         Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics);
 
+
+        /**
+         * @brief Construct a new Agent object
+         * 
+         * @param id Agent ID
+         * @param type Agent Type
+         * @param start Agent Start Location
+         * @param goal Agent Goal Location
+         * @param heuristics Agent Heuristics
+        */
+        Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics, int start_time);
         /**
          * @brief Overload the == operator for the priority queue
          * 
@@ -171,6 +186,10 @@ struct Collision{
     vector<pair<int, int>> loc;
     int timestep;
     bool for_movable_obstacle = false;
+
+    void printCollision() {
+        cout << "Agent " << agent1 << " is colliding with " << agent2 << " at location " << loc[0].first << ", " << loc[0].second << " at time step " << timestep << endl;
+    }
 };
 
 /**

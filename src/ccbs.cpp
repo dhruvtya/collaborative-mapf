@@ -89,7 +89,7 @@ Collision CCBS::detectFirstCollisionForPair(const vector<pair<int, int>> &path1,
     return Collision();
 }
 
-void CCBS::detectCollisions(const vector<vector<pair<int, int>>> &paths, vector<Collision> &collisions){
+void CCBS::detectCollisions(const vector<vector<pair<int, int>>> &paths, const vector<vector<pair<int, int>>> &helper_paths, vector<Collision> &collisions){
     // Detect collisions for all pairs of agents
     for(int i = 0; i < paths.size(); i++){
         for(int j = i + 1; j < paths.size(); j++){
@@ -230,7 +230,7 @@ vector<Result> CCBS::solve(){
     for(auto &agent : agents_list_){
         vector<pair<int, int>> path;
         vector<pair<int, int>> movable_obstacles;
-        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, vector<Constraint>(), path, movable_obstacles, 0);
+        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, vector<Constraint>(), path, movable_obstacles, agent.start_time_);
         if(path.empty()){
             cout << "\nNo path found for agent " << agent.id_ << endl;
             return vector<Result>();
@@ -263,6 +263,7 @@ vector<Result> CCBS::solve(){
         helper_agents_list.emplace_back(num_transit_agents_ + helpers_used.size() - 1, AgentType::HELPER, helper_parkings_[helper_id], obstacle, heuristics);
     }
 
+    num_helper_agents_ = helper_agents_list.size();
 
     // First, solve CBS for the helper agents
     // Initialize the constraint tree search
@@ -284,18 +285,18 @@ vector<Result> CCBS::solve(){
 
             // Find path to goal and back to parking
             vector<pair<int, int>> path1, path2;
-            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, root->constraints, path1, movable_obstacles, 0);
+            AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, root->constraints, path1, movable_obstacles, agent.start_time_);
             if(path1.empty()){
                 cout << "\nNo path found for agent " << agent.id_ << endl;
                 return vector<Result>();
             }
-            AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, agent.type_, root->constraints, path2, movable_obstacles, (int)path1.size() - 1);
+            // AStar::findAStarPath(map_, agent.goal_, agent.start_, agent.heuristics_, agent.id_, agent.type_, root->constraints, path2, movable_obstacles, (int)path1.size() - 1);
             path = path1;
-            if(path2.empty()){
-                cout << "\nNo path found for agent " << agent.id_ << endl;
-                return vector<Result>();
-            }
-            path.insert(path.end(), path2.begin() + 1, path2.end());
+            // if(path2.empty()){
+            //     cout << "\nNo path found for agent " << agent.id_ << endl;
+            //     return vector<Result>();
+            // }
+            // path.insert(path.end(), path2.begin() + 1, path2.end());
 
             root->paths[agent.id_] = path;
         }
@@ -303,7 +304,7 @@ vector<Result> CCBS::solve(){
         // Get the sum of costs
         root->cost = utils::getSumOfCosts(root->paths);
         // Detect collisions
-        detectCollisions(root->paths, root->collisions);
+        detectCollisions(root->paths, vector<vector<pair<int, int>>>(), root->collisions);
         
         // Add the root to the open list
         open_list.push(root);
@@ -349,21 +350,21 @@ vector<Result> CCBS::solve(){
                                             helper_agents_list[constraint.agent_id - num_transit_agents_].heuristics_, 
                                             helper_agents_list[constraint.agent_id - num_transit_agents_].id_, 
                                             helper_agents_list[constraint.agent_id - num_transit_agents_].type_, 
-                                            child_node->constraints, path1, movable_obstacles, 0);
+                                            child_node->constraints, path1, movable_obstacles, helper_agents_list[constraint.agent_id - num_transit_agents_].start_time_);
                 if(path1.empty()){
                     continue;
                 }
-                AStar::findAStarPath(map_, helper_agents_list[constraint.agent_id - num_transit_agents_].goal_, 
-                                            helper_agents_list[constraint.agent_id - num_transit_agents_].start_, 
-                                            helper_agents_list[constraint.agent_id - num_transit_agents_].heuristics_, 
-                                            helper_agents_list[constraint.agent_id - num_transit_agents_].id_, 
-                                            helper_agents_list[constraint.agent_id - num_transit_agents_].type_, 
-                                            child_node->constraints, path2, movable_obstacles, (int)path1.size() - 1);
-                if(path2.empty()){
-                    continue;
-                }
+                // AStar::findAStarPath(map_, helper_agents_list[constraint.agent_id - num_transit_agents_].goal_, 
+                //                             helper_agents_list[constraint.agent_id - num_transit_agents_].start_, 
+                //                             helper_agents_list[constraint.agent_id - num_transit_agents_].heuristics_, 
+                //                             helper_agents_list[constraint.agent_id - num_transit_agents_].id_, 
+                //                             helper_agents_list[constraint.agent_id - num_transit_agents_].type_, 
+                //                             child_node->constraints, path2, movable_obstacles, (int)path1.size() - 1);
+                // if(path2.empty()){
+                //     continue;
+                // }
                 path = path1;
-                path.insert(path.end(), path2.begin() + 1, path2.end());
+                // path.insert(path.end(), path2.begin() + 1, path2.end());
 
                 // Update the path for the agent
                 child_node->paths[constraint.agent_id] = path;
@@ -371,7 +372,7 @@ vector<Result> CCBS::solve(){
                 // Get the sum of costs
                 child_node->cost = utils::getSumOfCosts(child_node->paths);
                 // Detect collisions
-                detectCollisions(child_node->paths, child_node->collisions);
+                detectCollisions(child_node->paths, vector<vector<pair<int, int>>>(), child_node->collisions);
 
 
                 // Add the child to the open list
@@ -385,21 +386,33 @@ vector<Result> CCBS::solve(){
         }
     }
 
-    // Solve CBS for the transit agents
+    num_helper_agents_ = helper_results.size();
+
+    // Add helper agents to the transit agent list, converting them to transit
+    for(int i = 0; i < helper_agents_list.size(); i++){
+        vector<vector<int>> heuristics;
+        computeHeuristics(map_, helper_agents_list[i].start_, heuristics);
+        int start_time = helper_results[i].path_.size();
+        int id = helper_results[i].agent_id_;
+        agents_list_.emplace_back(Agent(id, AgentType::CONVERTED_TRANSIT, helper_agents_list[i].goal_, helper_agents_list[i].start_, heuristics, start_time));
+    }
+
+    // Solve CBS for all agents
     // Initialize the constraint tree search
     visited_nodes = 0;
 
     priority_queue<shared_ptr<CTNode>, vector<shared_ptr<CTNode>>, CompareCTNode> open_list;
     shared_ptr<CTNode> root {new CTNode {0, 
                                         generateTransitMOConstraints(helper_results), 
-                                        vector<vector<pair<int, int>>>(num_transit_agents_), 
+                                        vector<vector<pair<int, int>>>(agents_list_.size()), 
                                         vector<Collision>()}};
     
     // Find initial paths for each agent
     for(const auto &agent : agents_list_){
         vector<pair<int, int>> path;
         vector<pair<int, int>> movable_obstacles;
-        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, root->constraints, path, movable_obstacles, 0);
+        AStar::findAStarPath(map_, agent.start_, agent.goal_, agent.heuristics_, agent.id_, agent.type_, root->constraints, path, movable_obstacles, agent.start_time_);
+        printPath(path);
         if(path.empty()){
             cout << "\nNo path found for agent " << agent.id_ << endl;
             return vector<Result>();
@@ -411,9 +424,12 @@ vector<Result> CCBS::solve(){
     root->cost = utils::getSumOfCosts(root->paths);
     // Detect collisions
     vector<vector<pair<int, int>>> collision_checking_paths = root->paths;
-    collision_checking_paths.insert(collision_checking_paths.end(), helper_paths.begin(), helper_paths.end());
-    detectCollisions(collision_checking_paths, root->collisions);
+    // collision_checking_paths.insert(collision_checking_paths.end(), helper_paths.begin(), helper_paths.end());
+    detectCollisions(collision_checking_paths, helper_paths, root->collisions);
     
+    for (auto it:root->collisions) {
+        it.printCollision();
+    }
     // Add the root to the open list
     open_list.push(root);
 
@@ -429,12 +445,21 @@ vector<Result> CCBS::solve(){
 
         // Check if the current node has any collisions
         if(current_node->collisions.size() == 0){
-            // If there are no collisions, return the paths
-            for(int i = 0; i < current_node->paths.size(); i++){
+            // If there are no collisions, return the paths. First, append transit agent paths
+            // for(int i = 0; i < current_node->paths.size(); i++){      
+
+            for(int i = 0; i < num_transit_agents_; i++){
                 results.emplace_back(i, agents_list_[i].type_, agents_list_[i].start_, agents_list_[i].goal_, current_node->paths[i]);
             }
+
+            //Then, append results of agents converted from helper to transit
+            for (int i = 0; i < num_helper_agents_; i++) {
+                helper_results[i].path_.insert(helper_results[i].path_.end(), current_node->paths[i + num_transit_agents_].begin() + 1, current_node->paths[i + num_transit_agents_].end());
+            }
+
             // Add helper results
             results.insert(results.end(), helper_results.begin(), helper_results.end());
+            // cout << "Bruh: " << helper_results.size() << endl;
             break;
         }
 
@@ -458,7 +483,7 @@ vector<Result> CCBS::solve(){
                                         agents_list_[constraint.agent_id].heuristics_, 
                                         agents_list_[constraint.agent_id].id_, 
                                         agents_list_[constraint.agent_id].type_, 
-                                        child_node->constraints, path, movable_obstacles, 0);
+                                        child_node->constraints, path, movable_obstacles, agents_list_[constraint.agent_id].start_time_);
             if(path.size() == 0){
                 continue;
             }
@@ -469,7 +494,7 @@ vector<Result> CCBS::solve(){
             // Detect collisions
             collision_checking_paths = child_node->paths;
             collision_checking_paths.insert(collision_checking_paths.end(), helper_paths.begin(), helper_paths.end());
-            detectCollisions(collision_checking_paths, child_node->collisions);
+            detectCollisions(collision_checking_paths, helper_paths, child_node->collisions);
 
             // Get the sum of costs
             child_node->cost = utils::getSumOfCosts(child_node->paths, map_) + child_node->collisions.size();
