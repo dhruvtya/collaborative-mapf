@@ -1,5 +1,6 @@
 #include "prioritized.hpp"
 #include "cbs.hpp"
+#include "ccbs.hpp"
 
 int main(int argc, char* argv[]){
 
@@ -8,7 +9,7 @@ int main(int argc, char* argv[]){
         cout << "Arguments required: <algorithm> <map_name>" << endl;
         return 1;
     }
-    if(string(argv[1]) != "cbs" && string(argv[1]) != "prioritized"){
+    if(string(argv[1]) != "cbs" && string(argv[1]) != "prioritized" && string(argv[1]) != "ccbs"){
         cout << "Invalid algorithm" << endl;
         return 1;
     }
@@ -39,6 +40,11 @@ int main(int argc, char* argv[]){
         // Call Prioritized Planning
         PrioritizedPlanning p(map, starts, goals, helper_parkings);
         results = p.solve();
+    }
+    else if(string(argv[1]) == "ccbs") {
+        // Call CCBS
+        CCBS cc(map, starts, goals, helper_parkings);
+        results = cc.solve();
     }
 
     // Save results
