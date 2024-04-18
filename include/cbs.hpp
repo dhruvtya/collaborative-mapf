@@ -14,36 +14,6 @@ using namespace std;
 using namespace std::chrono;
 
 /**
- * @brief Struct for a collision
- */
-struct Collision{
-    int agent1;
-    int agent2;
-    vector<pair<int, int>> loc;
-    int timestep;
-    bool for_movable_obstacle = false;
-};
-
-/**
- * @brief Struct for a node in the constraint tree
- */
-struct CTNode{
-    double cost;
-    vector<Constraint> constraints;
-    vector<vector<pair<int, int>>> paths;
-    vector<Collision> collisions;
-};
-
-/**
- * @brief Struct to compare the CTNode for the priority queue
- */
-struct CompareCTNode{
-    bool operator()(const shared_ptr<CTNode> &lhs, const shared_ptr<CTNode> &rhs) const{
-        return lhs->cost > rhs->cost;
-    }
-};
-
-/**
  * @brief Class to handle the Conflict-Based Search
  */
 class CBS

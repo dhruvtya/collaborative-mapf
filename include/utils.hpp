@@ -151,4 +151,45 @@ namespace utils{
     double getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal);
 }
 
+
+/**
+ * @brief Struct for the constraint
+*/
+struct Constraint{
+    int agent_id;
+    vector<pair<int, int>> location;
+    int time_step;
+    bool for_movable_obstacle;
+};
+
+/**
+ * @brief Struct for a collision
+ */
+struct Collision{
+    int agent1;
+    int agent2;
+    vector<pair<int, int>> loc;
+    int timestep;
+    bool for_movable_obstacle = false;
+};
+
+/**
+ * @brief Struct for a node in the constraint tree
+ */
+struct CTNode{
+    double cost;
+    vector<Constraint> constraints;
+    vector<vector<pair<int, int>>> paths;
+    vector<Collision> collisions;
+};
+
+/**
+ * @brief Struct to compare the CTNode for the priority queue
+ */
+struct CompareCTNode{
+    bool operator()(const shared_ptr<CTNode> &lhs, const shared_ptr<CTNode> &rhs) const{
+        return lhs->cost > rhs->cost;
+    }
+};
+
 #endif // UTILS_HPP

@@ -15,16 +15,6 @@
 using namespace std;
 
 /**
- * @brief Struct for the constraint
-*/
-struct Constraint{
-    int agent_id;
-    vector<pair<int, int>> location;
-    int time_step;
-    bool for_movable_obstacle;
-};
-
-/**
  * @brief Typedef for the constraint table
 */
 typedef unordered_map<int, vector<Constraint>> ConstraintTable;
