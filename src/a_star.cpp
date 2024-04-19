@@ -101,6 +101,11 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
     // Initialize open list
     priority_queue<shared_ptr<Node>, vector<shared_ptr<Node>>, CompareNodes> open_list;
     shared_ptr<Node> root_node = make_shared<Node>(start, 0, heuristic_map[start.first][start.second], nullptr, starting_time_step);
+    
+    if (isConstrained(root_node->location, root_node->location, starting_time_step, constraint_table)) {
+        return;
+    }
+    
     open_list.push(root_node);
 
     // Initialize closed list

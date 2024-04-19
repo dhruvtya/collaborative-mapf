@@ -175,6 +175,15 @@ struct Constraint{
     vector<pair<int, int>> location;
     int time_step;
     bool for_movable_obstacle;
+
+    void printConstraint() {
+        if (location.size() == 1) {
+            cout << "Agent " << agent_id << " cannot be at " << location[0].first << ", " << location[0].second << " at time step " << time_step << "\n";
+        }
+        else {
+            cout << "Agent " << agent_id << " cannot cross from " << location[0].first << ", " << location[0].second << " to " << location[1].first << ", " << location[1].second << " at time step " << time_step << "\n";
+        }
+    }
 };
 
 /**

@@ -46,7 +46,8 @@ class CCBS
          * 
          * @return The collision detected
         */
-        Collision detectFirstCollisionForPair(const vector<pair<int, int>> &path1, const vector<pair<int, int>> &path2, int agent1, int agent2);
+        Collision detectFirstCollisionForPair(const vector<pair<int, int>> &path1, const vector<pair<int, int>> &path2, int agent1, int agent2, int start1, int start2);
+        Collision detectFirstCollisionForHelperPath(const vector<pair<int, int>> &path, const vector<pair<int, int>> &path_helper, int agent, int start);
 
         /**
          * @brief Detect collisions for all pairs of agents
@@ -54,7 +55,8 @@ class CCBS
          * @param paths The paths of all agents
          * @param collisions Reference for the collisions detected to be returned
         */
-        void detectCollisions(const vector<vector<pair<int, int>>> &paths, const vector<vector<pair<int, int>>> &helper_paths, vector<Collision> &collisions);
+        void detectCollisions(const vector<vector<pair<int, int>>> &paths, const vector<vector<pair<int, int>>> &helper_paths, vector<Collision> &collisions, const vector<int>& start_times);
+
 
         /**
          * @brief Generate constraints for the collision
