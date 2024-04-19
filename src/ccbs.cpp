@@ -438,6 +438,7 @@ vector<Result> CCBS::solve(){
     // Start the search
     cout << "Solving CBS for transit agents" << endl;
     while(!open_list.empty()){
+    // for (int iters = 0; iters < 6; iters++){
         // Get the node with the lowest cost
         if (open_list.empty()) {
             break;
@@ -445,6 +446,26 @@ vector<Result> CCBS::solve(){
         shared_ptr<CTNode> current_node = open_list.top();
         open_list.pop();
         visited_nodes++;
+        
+
+
+        // cout << "\rVisited transit nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << "\t" << flush;
+        cout << "\n\nVisited transit nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << ". COst is " << current_node->cost << "\n";
+        cout << "Collisions:\n";
+        for (auto it:current_node->collisions) {
+        it.printCollision();
+        }
+        cout << "Constraints:\n";
+        for (auto it:current_node->constraints) {
+            it.printConstraint();
+        }
+        cout << "Path for agent 1\n";
+        utils::printPath(current_node->paths[0]);
+        cout << "Path for agent 2\n";
+        utils::printPath(current_node->paths[1]);
+        cout << "Path for agent H1\n";
+        utils::printPath(current_node->paths[2]);
+        cout << "Generating children\n";
 
         // Check if the current node has any collisions
         if(current_node->collisions.size() == 0){
@@ -467,6 +488,8 @@ vector<Result> CCBS::solve(){
         vector<Constraint> constraints = generateConstraints(current_node->collisions[0]);
 
         // Create two new nodes with the constraints
+        int ccount = 1;
+
         for(auto &constraint:constraints){
             shared_ptr<CTNode> child_node {new CTNode {0, 
                                                         current_node->constraints, 
@@ -478,12 +501,24 @@ vector<Result> CCBS::solve(){
             // Find the path for the agent with the constraint
             vector<pair<int, int>> path;
             vector<pair<int, int>> movable_obstacles;
-            AStar::findAStarPath(map_, agents_list_[constraint.agent_id].start_, 
-                                        agents_list_[constraint.agent_id].goal_, 
-                                        agents_list_[constraint.agent_id].heuristics_, 
-                                        agents_list_[constraint.agent_id].id_, 
-                                        agents_list_[constraint.agent_id].type_, 
-                                        child_node->constraints, path, movable_obstacles, agents_list_[constraint.agent_id].start_time_);
+            // cout << "Replanning for Agent id " << constraint.agent_id << "\n";
+            if (constraint.agent_id >= num_transit_agents_) {
+                AStar::findAStarPathRelaxed(map_, agents_list_[constraint.agent_id].start_, 
+                            agents_list_[constraint.agent_id].goal_, 
+                            agents_list_[constraint.agent_id].heuristics_, 
+                            agents_list_[constraint.agent_id].id_, 
+                            agents_list_[constraint.agent_id].type_, 
+                            child_node->constraints, path, movable_obstacles, agents_list_[constraint.agent_id].start_time_);
+            }
+            else {
+                AStar::findAStarPath(map_, agents_list_[constraint.agent_id].start_, 
+                            agents_list_[constraint.agent_id].goal_, 
+                            agents_list_[constraint.agent_id].heuristics_, 
+                            agents_list_[constraint.agent_id].id_, 
+                            agents_list_[constraint.agent_id].type_, 
+                            child_node->constraints, path, movable_obstacles, agents_list_[constraint.agent_id].start_time_);
+            }
+
 
             if(path.size() == 0){
                 continue;
@@ -497,6 +532,33 @@ vector<Result> CCBS::solve(){
 
             // Get the sum of costs
             child_node->cost = utils::getSumOfCosts(child_node->paths, map_) + child_node->collisions.size();
+
+            cout << "Child node " << ccount << "\n";
+            for (int i = num_transit_agents_; i < child_node->paths.size(); i++) {
+                int waits = utils::getNumWaits(child_node->paths[i]);
+
+                cout << "Waits: " << waits << ". Current cost = " << child_node->cost << ", ";
+                child_node->cost -= waits;
+                child_node->cost += (waits * (0.5));
+                cout << "Final Cost " << child_node->cost << "\n";
+            }
+
+            ccount++;
+            cout << "Collisions:\n";
+            for (auto it:child_node->collisions) {
+            it.printCollision();
+            }
+            cout << "Constraints:\n";
+            for (auto it:child_node->constraints) {
+                it.printConstraint();
+            }
+
+            cout << "Path for agent 1\n";
+            utils::printPath(current_node->paths[0]);
+            cout << "Path for agent 2\n";
+            utils::printPath(child_node->paths[1]);
+            cout << "Path for agent H1\n";
+            utils::printPath(child_node->paths[2]);
 
             // Add child to the open list
             open_list.push(child_node);

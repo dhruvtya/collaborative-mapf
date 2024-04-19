@@ -22,7 +22,6 @@ enum class AgentType{
  * @brief Class to represent an Agent
 */
 
-void printPath(const vector<pair<int, int>>& path);
 class Agent{
     public:
         // Variables
@@ -164,6 +163,11 @@ namespace utils{
      * @return The manhattan distance between the two points
     */
     double getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal);
+
+    int getNumWaits(const vector<pair<int, int>>& path);
+
+    void printPath(const vector<pair<int, int>>& path);
+
 }
 
 
@@ -216,6 +220,9 @@ struct CTNode{
  */
 struct CompareCTNode{
     bool operator()(const shared_ptr<CTNode> &lhs, const shared_ptr<CTNode> &rhs) const{
+        if (lhs->cost == rhs->cost) {
+            return lhs->constraints.size() > rhs->constraints.size();
+        }
         return lhs->cost > rhs->cost;
     }
 };

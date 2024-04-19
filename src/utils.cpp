@@ -228,7 +228,18 @@ double utils::getManhattanDistance(const pair<int, int> &start, const pair<int, 
     return abs(start.first - goal.first) + abs(start.second - goal.second);
 }
 
-void printPath(const vector<pair<int, int>>& path) {
+int utils::getNumWaits(const vector<pair<int, int>>& path) {
+    int waits = 0;
+    for (int i = 1; i < path.size(); i++) {
+        if (path[i-1] == path[i]) {
+            waits++;
+        }
+    }
+    return waits;
+}
+
+
+void utils::printPath(const vector<pair<int, int>>& path) {
     std::cout << "++++++++Printing Path++++++++++\n";
     for (auto it:path) {
         cout << it.first << ", " << it.second << endl;

@@ -139,6 +139,16 @@ namespace AStar{
                         vector<pair<int, int>>& path, 
                         vector<pair<int, int>>& movable_obstacles, 
                         int starting_time_step);
+
+    void findAStarPathRelaxed(const Map& obstacle_map, 
+                    const pair<int, int>& start, 
+                    const pair<int, int>& goal, 
+                    const Map& heuristic_map, 
+                    int agent_id, const AgentType& agent_type, 
+                    const vector<Constraint>& constraints, 
+                    vector<pair<int, int>>& path, 
+                    vector<pair<int, int>>& movable_obstacles, 
+                    int starting_time_step);
 }
 
 #endif // A_STAR_HPP
