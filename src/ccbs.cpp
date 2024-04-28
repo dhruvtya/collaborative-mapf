@@ -71,7 +71,6 @@ Collision CCBS::detectFirstCollisionForPair(const vector<pair<int, int>> &path1,
         }
 
         if(path1[path1_ind] == path2[path2_next_ind] && path1[path1_next_ind] == path2[path2_ind]){
-            // cout << "Bruh\n";
             return Collision{agent1, agent2, {path1[path1_next_ind], path1[path1_ind]}, t};
 
         }
@@ -86,9 +85,6 @@ Collision CCBS::detectFirstCollisionForHelperPath(const vector<pair<int, int>> &
     
     int end = start + path.size();
     int helper_end = int(path_helper.size()) - 2;
-    // cout << "helper_end: " << helper_end << "\n";
-    // cout << "Start time of agent is " << start << "\n";
-    // cout << "End time of agent is " << end << "\n";
 
     // If either of the paths is empty, return empty collision
     if(path.size() == 0 || path_helper.size() == 0){
@@ -97,9 +93,6 @@ Collision CCBS::detectFirstCollisionForHelperPath(const vector<pair<int, int>> &
 
     for (int t = 0; t <= helper_end; t++) {
         int path_ind = t - start;
-        // cout << "Path index is " << path_ind << "\n";
-        // cout << "Position of agent is " << path[path_ind].first << ", " << path[path_ind].second << "\n";
-        // cout << "Position of helper is " << path_helper[t].first << ", " << path_helper[t].second << "\n";
         int path_next_ind = path_ind + 1;
 
         if (path_ind < 0 || path_ind >= path.size()) {
@@ -119,7 +112,6 @@ Collision CCBS::detectFirstCollisionForHelperPath(const vector<pair<int, int>> &
         }
 
     }
-    // cout << "No collisions\n";
     return Collision();
 
 }
@@ -130,8 +122,6 @@ void CCBS::detectCollisions(const vector<vector<pair<int, int>>> &paths, const v
         for(int j = i + 1; j < paths.size(); j++){
             Collision collision = detectFirstCollisionForPair(paths[i], paths[j], i, j, start_times[i], start_times[j]);
             if(collision.loc.size() > 0){
-                // cout << "Detected Collision between " << i << " and " << j << " at time " << collision.timestep << "\n";
-                // cout << "Their start times are " << start_times[i] << " and " << start_times[j] << "\n";
                 collisions.push_back(collision);
             }
         }
@@ -142,7 +132,6 @@ void CCBS::detectCollisions(const vector<vector<pair<int, int>>> &paths, const v
             Collision collision = detectFirstCollisionForHelperPath(paths[i], helper_paths[j], i, start_times[i]);
             if(collision.loc.size() > 0){
                 collisions.push_back(collision);
-                // cout << "Detected Collision between helper " << j + num_transit_agents << " and agent" << i << " at time " << collision.timestep << "\n";
             }
         }
     }
@@ -153,23 +142,19 @@ vector<Constraint> CCBS::generateConstraints(const Collision &collision){
     if(collision.agent2 != -1){
         // If the collision is a vertex collision
         if(collision.loc.size() == 1){
-            cout << "Bruh1\n";
             return {Constraint{collision.agent1, {collision.loc[0]}, collision.timestep, false}, 
                     Constraint{collision.agent2, {collision.loc[0]}, collision.timestep, false}};
         }
 
         // If the collision is an edge collision
-        cout << "Bruh2\n";
         return {Constraint{collision.agent1, {collision.loc[1], collision.loc[0]}, collision.timestep, false}, 
                 Constraint{collision.agent2, {collision.loc[0], collision.loc[1]}, collision.timestep, false}};
     }
 
     // If one of the agents is helper agent
     if(collision.loc.size() == 1){
-        cout << "Bruh3\n";
         return {Constraint{collision.agent1, {collision.loc[0]}, collision.timestep, false}};
     }
-    cout << "Bruh4\n";
     return {Constraint{collision.agent1, {collision.loc[1], collision.loc[0]}, collision.timestep, false}};
     
 }
@@ -457,7 +442,6 @@ vector<Result> CCBS::solve(){
     // Start the search
     cout << "Solving CBS for transit agents" << endl;
     while(!open_list.empty()){
-    // for (int iters = 0; iters < 15; iters++){
         // Get the node with the lowest cost
         if (open_list.empty()) {
             break;
@@ -466,26 +450,7 @@ vector<Result> CCBS::solve(){
         open_list.pop();
         visited_nodes++;
         
-        // cout << "\rVisited transit nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << "\t" << flush;
-        cout << "\n\n\n\n\n\nVisited transit nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << ". COst is " << current_node->cost << "\n";
-        cout << "Collisions that are gonna be resolved:\n";
-        // for (auto it:current_node->collisions) {
-        // it.printCollision();
-        // }
-        if (current_node->collisions.size() > 0) {
-            current_node->collisions[0].printCollision();
-        }
-        cout << "Constraints:\n";
-        for (auto it:current_node->constraints) {
-            it.printConstraint();
-        }
-        cout << "Path for agent 1\n";
-        utils::printPath(current_node->paths[0]);
-        cout << "Path for agent 2\n";
-        utils::printPath(current_node->paths[1]);
-        cout << "Path for agent H1\n";
-        utils::printPath(current_node->paths[2]);
-        cout << "Generating children\n";
+        cout << "\rVisited transit nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << "\t" << flush;
 
         // Check if the current node has any collisions
         if(current_node->collisions.size() == 0){
@@ -508,11 +473,7 @@ vector<Result> CCBS::solve(){
         vector<Constraint> constraints = generateConstraints(current_node->collisions[0]);
         
         // Create two new nodes with the constraints
-        int ccount = 1;
-
         for(auto &constraint:constraints){
-            cout << "Constraint generated " << "\n";
-            constraint.printConstraint();
             shared_ptr<CTNode> child_node {new CTNode {0, 
                                                         current_node->constraints, 
                                                         current_node->paths, 
@@ -523,26 +484,13 @@ vector<Result> CCBS::solve(){
             // Find the path for the agent with the constraint
             vector<pair<int, int>> path;
             vector<pair<int, int>> movable_obstacles;
-            cout << "Replanning for Agent id " << constraint.agent_id << " with start time " << agents_list_[constraint.agent_id].start_time_ << "\n";
-            if (constraint.agent_id >= num_transit_agents_) {
-                AStar::findAStarPathRelaxed(map_, agents_list_[constraint.agent_id].start_, 
-                            agents_list_[constraint.agent_id].goal_, 
-                            agents_list_[constraint.agent_id].heuristics_, 
-                            agents_list_[constraint.agent_id].id_, 
-                            agents_list_[constraint.agent_id].type_, 
-                            child_node->constraints, path, movable_obstacles, agents_list_[constraint.agent_id].start_time_);
-            }
-            else {
-                AStar::findAStarPath(map_, agents_list_[constraint.agent_id].start_, 
-                            agents_list_[constraint.agent_id].goal_, 
-                            agents_list_[constraint.agent_id].heuristics_, 
-                            agents_list_[constraint.agent_id].id_, 
-                            agents_list_[constraint.agent_id].type_, 
-                            child_node->constraints, path, movable_obstacles, agents_list_[constraint.agent_id].start_time_);
-            }
-            cout << "Replanned path-\n";
-            utils::printPath(path);
 
+            AStar::findAStarPath(map_, agents_list_[constraint.agent_id].start_, 
+                        agents_list_[constraint.agent_id].goal_, 
+                        agents_list_[constraint.agent_id].heuristics_, 
+                        agents_list_[constraint.agent_id].id_, 
+                        agents_list_[constraint.agent_id].type_, 
+                        child_node->constraints, path, movable_obstacles, agents_list_[constraint.agent_id].start_time_);
 
             if(path.size() == 0){
                 continue;
@@ -552,41 +500,10 @@ vector<Result> CCBS::solve(){
 
             // Detect collisions
             collision_checking_paths = child_node->paths;
-            cout << "Checking for collisions after replanning\n";
             detectCollisions(collision_checking_paths, helper_paths, child_node->collisions, start_times);
 
             // Get the sum of costs
-            // child_node->cost = utils::getSumOfCosts(child_node->paths, map_) + child_node->collisions.size();
             child_node->cost = utils::getSumOfCosts(child_node->paths, num_transit_agents_);
-
-            // cout << "Child node " << ccount << "\n";
-            for (int i = num_transit_agents_; i < child_node->paths.size(); i++) {
-                // int waits = utils::getNumWaits(child_node->paths[i]);
-
-                // cout << "Waits: " << waits << ". Current cost = " << child_node->cost << ", ";
-                // child_node->cost -= waits;
-                // child_node->cost += (waits * (0.5));
-            }
-            cout << "Final Cost " << child_node->cost << "\n";
-
-            ccount++;
-            cout << "Collisions:\n";
-            for (auto it:child_node->collisions) {
-            it.printCollision();
-            }
-            // cout << "Constraints:\n";
-            // for (auto it:child_node->constraints) {
-                // it.printConstraint();
-            // }
-
-            // cout << "Path for agent 1\n";
-            // utils::printPath(current_node->paths[0]);
-            // cout << "Path for agent 2\n";
-            // utils::printPath(child_node->paths[1]);
-            // cout << "Path for agent H1\n";
-            // utils::printPath(child_node->paths[2]);
-
-            // Add child to the open list
             open_list.push(child_node);
         }
     }
@@ -601,10 +518,18 @@ vector<Result> CCBS::solve(){
         return results;
     }
 
+
+    int makespan = utils::prunePathsAndGetMakeSpan(results, num_transit_agents_);
+    for (int i = 0; i < results.size(); i++) {
+        cout << "Agent " << i << " path: ";
+        utils::printPath(results[i].path_);
+    }
+
     // Metrics
     cout << "\nFound solution ----------" << endl;
     cout << "| Comp. time: " << duration_cast<milliseconds>(end_time - start_time).count() << "ms\t|" << endl;
-    cout << "| Sum of costs: " << utils::getSumOfCosts(results) << "\t|" << endl;
+    cout << "| Sum of costs: " << utils::getSumOfCosts(results, num_transit_agents_) << "\t|" << endl;
+    cout << "| Makespan: " << makespan << "\t|" << endl;
     cout << "-------------------------" << endl;
 
     return results;

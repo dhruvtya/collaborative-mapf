@@ -216,6 +216,14 @@ double utils::getSumOfCosts(const vector<Result> &results){
     return sum;
 }
 
+double utils::getSumOfCosts(const vector<Result> &results, int num_transit_agents){
+    double sum = 0;
+    for (int i = 0; i < num_transit_agents; i++) {
+        sum += results[i].path_.size();
+    }
+    return sum;
+}
+
 double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const vector<vector<int>> &map){
     double sum = getSumOfCosts(paths);
     
@@ -254,4 +262,21 @@ void utils::printPath(const vector<pair<int, int>>& path) {
     }
     std::cout << "+++++++++++++++++++++++++++++++\n";
 
+}
+
+int utils::prunePathsAndGetMakeSpan(vector<Result>& results, int num_transit_agents) {
+    int max_transit_path = 0;
+    for (int i = 0; i < num_transit_agents; i++) {
+        if (results[i].path_.size() > max_transit_path) {
+            max_transit_path = results[i].path_.size();
+        }
+    }
+
+    for (int i = 0; i < results.size(); i++) {
+        if (results[i].path_.size() > max_transit_path) {
+            results[i].path_.resize(max_transit_path);
+        }
+    }
+
+    return max_transit_path;
 }

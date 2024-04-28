@@ -145,6 +145,7 @@ namespace utils{
      * @param results The results to be summed
     */
     double getSumOfCosts(const vector<Result> &results);
+    double getSumOfCosts(const vector<Result> &results, int num_transit_agents);
 
     /**
      * @brief (Overloaded) Get the sum of costs of the paths
@@ -170,6 +171,8 @@ namespace utils{
     int getNumWaits(const vector<pair<int, int>>& path);
 
     void printPath(const vector<pair<int, int>>& path);
+
+    int prunePathsAndGetMakeSpan(vector<Result>& results, int num_transit_agents);
 
 }
 
