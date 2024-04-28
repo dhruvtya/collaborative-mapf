@@ -204,6 +204,7 @@ void AStar::findAStarPathRelaxed(const Map& obstacle_map, const pair<int, int>& 
                             vector<pair<int, int>>& movable_obstacles, int starting_time_step){
 
     // Build constraint table
+    cout << "Using relaxed A star\n";
     ConstraintTable constraint_table;
     buildConstraintTable(constraints, agent_id, constraint_table);
     ConstraintTable mo_helper_constraint_table;
@@ -293,7 +294,7 @@ void AStar::findAStarPathRelaxed(const Map& obstacle_map, const pair<int, int>& 
             shared_ptr<Node> child_node;
 
             if (move == pair<int, int>({0,0})) {
-                child_node = make_shared<Node>(child_location, current_node->g_value + 0.5, heuristic_map[child_location.first][child_location.second], current_node, current_node->time_step + 1);
+                child_node = make_shared<Node>(child_location, current_node->g_value + 1.0, heuristic_map[child_location.first][child_location.second], current_node, current_node->time_step + 1);
             }
             else {
                 child_node = make_shared<Node>(child_location, current_node->g_value + 1, heuristic_map[child_location.first][child_location.second], current_node, current_node->time_step + 1);

@@ -200,6 +200,14 @@ double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths){
     return sum;
 }
 
+double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths, int num_transit_agents){
+    double sum = 0;
+    for (int i = 0; i < num_transit_agents; i++) {
+        sum += paths[i].size();
+    }
+    return sum;
+}
+
 double utils::getSumOfCosts(const vector<Result> &results){
     double sum = 0;
     for(const auto &result : results){

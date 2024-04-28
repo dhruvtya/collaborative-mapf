@@ -154,6 +154,9 @@ namespace utils{
     */
     double getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const vector<vector<int>> &map);
 
+    double getSumOfCosts(const vector<vector<pair<int, int>>> &paths, int num_transit_agents);
+
+
     /**
      * @brief Get the manhattan distance between two points
      * 
@@ -201,7 +204,14 @@ struct Collision{
     bool for_movable_obstacle = false;
 
     void printCollision() {
-        cout << "Agent " << agent1 << " is colliding with " << agent2 << " at location " << loc[0].first << ", " << loc[0].second << " at time step " << timestep << endl;
+        if (loc.size() == 1) {
+            cout << "Agent " << agent1 << " is colliding with " << agent2 << " at location " << loc[0].first << ", " << loc[0].second << " at time step " << timestep << endl;
+        }
+        else if (loc.size() == 0) {
+            cout << "No collision detected\n";
+        } else {
+            cout << "Agent " << agent1 << " is colliding with " << agent2 << " at location " << loc[0].first << ", " << loc[0].second << " to " << loc[1].first << ", " << loc[1].second << " at time step " << timestep << endl;
+        }
     }
 };
 
