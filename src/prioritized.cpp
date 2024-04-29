@@ -233,15 +233,14 @@ vector<Result> PrioritizedPlanning::solve(){
     // End timer
     auto end_time = high_resolution_clock::now();
     auto computation_time = duration_cast<milliseconds>(end_time - start_time);
-    
+
+    int makespan = utils::prunePathsAndGetMakeSpan(results);
     // Metrics
     cout << "\nFound solution ----------" << endl;
     cout << "| Comp. time: " << duration_cast<milliseconds>(end_time - start_time).count() << "ms\t|" << endl;
-    cout << "| Sum of costs: " << utils::getSumOfCosts(results) << "\t|" << endl;
+    cout << "| Sum of costs: " << utils::getSumOfCosts(results, num_transit_agents_) << "\t|" << endl;
+    cout << "| Makespan: " << makespan << "\t|" << endl;
     cout << "-------------------------" << endl;
-
-    // Print result
-    // utils::printResults(results);
     
     return results;
 }

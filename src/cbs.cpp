@@ -472,7 +472,8 @@ vector<Result> CBS::solve(){
             detectCollisions(collision_checking_paths, child_node->collisions);
 
             // Get the sum of costs
-            child_node->cost = utils::getSumOfCosts(child_node->paths, map_) + child_node->collisions.size();
+            // child_node->cost = utils::getSumOfCosts(child_node->paths, map_) + child_node->collisions.size();
+            child_node->cost = utils::getSumOfCosts(child_node->paths);
 
             // Add child to the open list
             open_list.push(child_node);
@@ -489,14 +490,13 @@ vector<Result> CBS::solve(){
         return results;
     }
 
+    int makespan = utils::prunePathsAndGetMakeSpan(results);
     // Metrics
     cout << "\nFound solution ----------" << endl;
     cout << "| Comp. time: " << duration_cast<milliseconds>(end_time - start_time).count() << "ms\t|" << endl;
-    cout << "| Sum of costs: " << utils::getSumOfCosts(results) << "\t|" << endl;
+    cout << "| Sum of costs: " << utils::getSumOfCosts(results, num_transit_agents_) << "\t|" << endl;
+    cout << "| Makespan: " << makespan << "\t|" << endl;
     cout << "-------------------------" << endl;
-
-    // Print result
-    // utils::printResults(results);
 
     return results;
 }

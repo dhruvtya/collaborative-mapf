@@ -264,9 +264,13 @@ void utils::printPath(const vector<pair<int, int>>& path) {
 
 }
 
-int utils::prunePathsAndGetMakeSpan(vector<Result>& results, int num_transit_agents) {
+int utils::prunePathsAndGetMakeSpan(vector<Result>& results) {
     int max_transit_path = 0;
-    for (int i = 0; i < num_transit_agents; i++) {
+    for (int i = 0; i < results.size(); i++) {
+        if (results[i].type_ != AgentType::TRANSIT) {
+            continue;
+        }
+
         if (results[i].path_.size() > max_transit_path) {
             max_transit_path = results[i].path_.size();
         }

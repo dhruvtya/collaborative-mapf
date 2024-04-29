@@ -172,7 +172,7 @@ namespace utils{
 
     void printPath(const vector<pair<int, int>>& path);
 
-    int prunePathsAndGetMakeSpan(vector<Result>& results, int num_transit_agents);
+    int prunePathsAndGetMakeSpan(vector<Result>& results);
 
 }
 
@@ -234,7 +234,8 @@ struct CTNode{
 struct CompareCTNode{
     bool operator()(const shared_ptr<CTNode> &lhs, const shared_ptr<CTNode> &rhs) const{
         if (lhs->cost == rhs->cost) {
-            return lhs->constraints.size() > rhs->constraints.size();
+            // return lhs->constraints.size() > rhs->constraints.size();
+            return lhs->collisions.size() > rhs->collisions.size();
         }
         return lhs->cost > rhs->cost;
     }

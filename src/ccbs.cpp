@@ -519,12 +519,7 @@ vector<Result> CCBS::solve(){
     }
 
 
-    int makespan = utils::prunePathsAndGetMakeSpan(results, num_transit_agents_);
-    for (int i = 0; i < results.size(); i++) {
-        cout << "Agent " << i << " path: ";
-        utils::printPath(results[i].path_);
-    }
-
+    int makespan = utils::prunePathsAndGetMakeSpan(results);
     // Metrics
     cout << "\nFound solution ----------" << endl;
     cout << "| Comp. time: " << duration_cast<milliseconds>(end_time - start_time).count() << "ms\t|" << endl;
