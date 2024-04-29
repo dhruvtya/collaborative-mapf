@@ -443,6 +443,15 @@ vector<Result> CCBS::solve(){
     cout << "Solving CBS for transit agents" << endl;
     while(!open_list.empty()){
         // Get the node with the lowest cost
+        
+        auto curr_time = high_resolution_clock::now();
+        auto time_elapsed = duration_cast<milliseconds>(curr_time - start_time);
+
+        if(time_elapsed.count() > 60000){
+            cout << "Timeout" << endl;
+            break;
+        }
+        
         if (open_list.empty()) {
             break;
         }
@@ -450,7 +459,7 @@ vector<Result> CCBS::solve(){
         open_list.pop();
         visited_nodes++;
         
-        cout << "\rVisited transit nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << "\t" << flush;
+        // cout << "\rVisited transit nodes: " << visited_nodes << "/" << visited_nodes + open_list.size() << "\t" << flush;
 
         // Check if the current node has any collisions
         if(current_node->collisions.size() == 0){
