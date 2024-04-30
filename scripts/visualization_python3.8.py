@@ -281,9 +281,10 @@ if __name__ == '__main__':
                     paths.append(path)
 
     print("***Test paths on a simulation***")
+    start_paths = []
+    for i in range(len(paths)):
+        start_paths.append([paths[i][0]])
+        
     animation = Animation(my_map, starts, goals, paths, args.solver)
-    
-    # if args.record:
-        # animation.save('output/' + args.solver + "_" + args.instance + '.mp4', args.speed)
 
     animation.show()
