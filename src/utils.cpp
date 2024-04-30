@@ -218,8 +218,11 @@ double utils::getSumOfCosts(const vector<Result> &results){
 
 double utils::getSumOfCosts(const vector<Result> &results, int num_transit_agents){
     double sum = 0;
-    for (int i = 0; i < num_transit_agents; i++) {
-        sum += results[i].path_.size();
+    for (int i = 0; i < results.size(); i++) {
+        // sum += results[i].path_.size();
+        if (results[i].type_ == AgentType::TRANSIT) {
+            sum += results[i].path_.size();
+        }
     }
     return sum;
 }
