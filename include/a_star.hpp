@@ -15,16 +15,6 @@
 using namespace std;
 
 /**
- * @brief Struct for the constraint
-*/
-struct Constraint{
-    int agent_id;
-    vector<pair<int, int>> location;
-    int time_step;
-    bool for_movable_obstacle;
-};
-
-/**
  * @brief Typedef for the constraint table
 */
 typedef unordered_map<int, vector<Constraint>> ConstraintTable;
@@ -149,6 +139,16 @@ namespace AStar{
                         vector<pair<int, int>>& path, 
                         vector<pair<int, int>>& movable_obstacles, 
                         int starting_time_step);
+
+    void findAStarPathRelaxed(const Map& obstacle_map, 
+                    const pair<int, int>& start, 
+                    const pair<int, int>& goal, 
+                    const Map& heuristic_map, 
+                    int agent_id, const AgentType& agent_type, 
+                    const vector<Constraint>& constraints, 
+                    vector<pair<int, int>>& path, 
+                    vector<pair<int, int>>& movable_obstacles, 
+                    int starting_time_step);
 }
 
 #endif // A_STAR_HPP

@@ -101,6 +101,11 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
     // Initialize open list
     priority_queue<shared_ptr<Node>, vector<shared_ptr<Node>>, CompareNodes> open_list;
     shared_ptr<Node> root_node = make_shared<Node>(start, 0, heuristic_map[start.first][start.second], nullptr, starting_time_step);
+    
+    if (isConstrained(root_node->location, root_node->location, starting_time_step, constraint_table)) {
+        return;
+    }
+    
     open_list.push(root_node);
 
     // Initialize closed list
@@ -127,7 +132,6 @@ void AStar::findAStarPath(const Map& obstacle_map, const pair<int, int>& start, 
 
         // Check if time step exceeds maximum time step
         if (current_node->time_step > max_time_step) {
-            std::cout << "Time step exceeded" << endl;
             return;
         }
 

@@ -1,5 +1,5 @@
-#ifndef CBS_HPP
-#define CBS_HPP
+#ifndef CCBS_HPP
+#define CCBS_HPP
 
 #include <iostream>
 #include <chrono>
@@ -14,9 +14,9 @@ using namespace std;
 using namespace std::chrono;
 
 /**
- * @brief Class to handle the Conflict-Based Search
+ * @brief Class to handle the Combined Conflict-Based Search
  */
-class CBS
+class CCBS
 {
     private:
         // Variables
@@ -46,7 +46,8 @@ class CBS
          * 
          * @return The collision detected
         */
-        Collision detectFirstCollisionForPair(const vector<pair<int, int>> &path1, const vector<pair<int, int>> &path2, int agent1, int agent2);
+        Collision detectFirstCollisionForPair(const vector<pair<int, int>> &path1, const vector<pair<int, int>> &path2, int agent1, int agent2, int start1, int start2);
+        Collision detectFirstCollisionForHelperPath(const vector<pair<int, int>> &path, const vector<pair<int, int>> &path_helper, int agent, int start);
 
         /**
          * @brief Detect collisions for all pairs of agents
@@ -54,7 +55,8 @@ class CBS
          * @param paths The paths of all agents
          * @param collisions Reference for the collisions detected to be returned
         */
-        void detectCollisions(const vector<vector<pair<int, int>>> &paths, vector<Collision> &collisions);
+        void detectCollisions(const vector<vector<pair<int, int>>> &paths, const vector<vector<pair<int, int>>> &helper_paths, vector<Collision> &collisions, const vector<int>& start_times);
+
 
         /**
          * @brief Generate constraints for the collision
@@ -88,27 +90,27 @@ class CBS
 
     public:
         /**
-         * @brief Constructer for CBS class
+         * @brief Constructer for CCBS class
          * 
          * @param map The map of the environment
          * @param starts The starting locations of the agents
          * @param goals The goal locations of the agents
          * @param helper_parkings The helper agents parkings
         */
-        CBS(vector<vector<int>> map, vector<pair<int, int>> starts, vector<pair<int, int>> goals, vector<pair<int, int>> helper_parkings);
+        CCBS(vector<vector<int>> map, vector<pair<int, int>> starts, vector<pair<int, int>> goals, vector<pair<int, int>> helper_parkings);
 
         /**
-         * @brief Destructor for CBS class
+         * @brief Destructor for CCBS class
         */
-        ~CBS(){}
+        ~CCBS(){}
         
         /**
-         * @brief Solve the CBS problem
+         * @brief Solve the CCBS problem
          * 
-         * @return The results of the CBS solver
+         * @return The results of the CCBS solver
         */
         vector<Result> solve();
 };
 
 
-#endif // CBS_HPP
+#endif // CCBS_HPP

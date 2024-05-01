@@ -1,7 +1,10 @@
 #include "utils.hpp"
 
 Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics)
-                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}{}
+                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}, start_time_{0}{}
+
+Agent::Agent(int id, AgentType type, pair<int, int> start, pair<int, int> goal, vector<vector<int>> heuristics, int start_time)
+                            : id_{id}, type_{type}, start_{start}, goal_{goal}, heuristics_{heuristics}, start_time_{start_time}{}
 
 bool Agent::operator<(const Agent& other) const{
     // Agents with lower ID have higher priority
@@ -197,10 +200,29 @@ double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths){
     return sum;
 }
 
+double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths, int num_transit_agents){
+    double sum = 0;
+    for (int i = 0; i < num_transit_agents; i++) {
+        sum += paths[i].size();
+    }
+    return sum;
+}
+
 double utils::getSumOfCosts(const vector<Result> &results){
     double sum = 0;
     for(const auto &result : results){
         sum += result.path_.size();
+    }
+    return sum;
+}
+
+double utils::getSumOfCosts(const vector<Result> &results, int num_transit_agents){
+    double sum = 0;
+    for (int i = 0; i < results.size(); i++) {
+        // sum += results[i].path_.size();
+        if (results[i].type_ == AgentType::TRANSIT) {
+            sum += results[i].path_.size();
+        }
     }
     return sum;
 }
@@ -223,4 +245,45 @@ double utils::getSumOfCosts(const vector<vector<pair<int, int>>> &paths, const v
 
 double utils::getManhattanDistance(const pair<int, int> &start, const pair<int, int> &goal){
     return abs(start.first - goal.first) + abs(start.second - goal.second);
+}
+
+int utils::getNumWaits(const vector<pair<int, int>>& path) {
+    int waits = 0;
+    for (int i = 1; i < path.size(); i++) {
+        if (path[i-1] == path[i]) {
+            waits++;
+        }
+    }
+    return waits;
+}
+
+
+void utils::printPath(const vector<pair<int, int>>& path) {
+    std::cout << "++++++++Printing Path++++++++++\n";
+    for (auto it:path) {
+        cout << it.first << ", " << it.second << endl;
+    }
+    std::cout << "+++++++++++++++++++++++++++++++\n";
+
+}
+
+int utils::prunePathsAndGetMakeSpan(vector<Result>& results) {
+    int max_transit_path = 0;
+    for (int i = 0; i < results.size(); i++) {
+        if (results[i].type_ != AgentType::TRANSIT) {
+            continue;
+        }
+
+        if (results[i].path_.size() > max_transit_path) {
+            max_transit_path = results[i].path_.size();
+        }
+    }
+
+    for (int i = 0; i < results.size(); i++) {
+        if (results[i].path_.size() > max_transit_path) {
+            results[i].path_.resize(max_transit_path);
+        }
+    }
+
+    return max_transit_path;
 }
