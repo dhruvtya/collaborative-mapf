@@ -1,10 +1,24 @@
-# Multi-robot Planning for Hetergoenous Robot Fleets in Dynamic Environments
+# Multi-robot Planning for Collaborative Robot Fleets in Dynamic Environments
 
-Build code using ```. build.sh```. This requires a minimum g++ version of 10 to build correctly. If you are on Ubuntu 20.04 and earlier, you need to install g++10 manually, and use the command ```. build_ubuntu_20.sh``` to build the project. Make sure to use chmod to give execute permissions to the sh files before running them. 
+Existing Multi-Agent Path Finding algorithms and implementations assume that the agents themselves do not bring about many changes to their environments. Although, there are applications ranging from autonomous construction, agriculture to re-configurable warehouses, where different types of agents can make changes to the environment they are operating in. Some agents can clear obstacles while others can even make obstacles. 
 
-Run code using ```. run.sh <solver_name> <map_name> <animation_speed> (optional to save animation)``` This requires python 3.9 or later, if you have a lower version of python, please use ```. run_python3.8.sh <solver_name> <map_name> <animation_speed>``` to run your code. However, the second script doesn't have the ability to save the animation. Again, make sure that you give execute permissions to the sh files first. 
+This repository contains implementations of 3 approaches to solve the scenarios that have agents which can move temporary obstacles to allow for other agents to reach their goal. The approaches are derived from conventional centralized algorithms, namely Prioritized Planning and Conflict-based Search.
 
-The options that can be given to solver_name are _prioritized_ (for CPP), _cbs_ (for C2SC) and _ccbs_ (for C2SC+). For the map name option, you can give the name of any map file in the maps folder. Don't give the .txt extension with the map file name. The maps with the 0_ prefix don't have any movable obstacles or helper agents, and are purely for testing the vanilla CBS/PP implementations. The maps with 1_ prefix are the ones that were used to test the final code. 
+<p align="center">
+<img src="./media/1_1.gif" width="60%" height="60%"/>
+<img src="./media/1_3.gif" width="60%" height="60%"/>
+<img src="./media/1_13.gif" width="49%" height="49%"/>
+<img src="./media/1_15.gif" width="49%" height="49%"/>
+<img src="./media/1_17.gif" width="100%" height="100%"/>
+</p>
+
+## Instructions
+
+Build code using ```. build.sh```. This requires a minimum g++ version of 10 to build correctly. If you are on Ubuntu 20.04 and earlier, you need to install g++10 manually, and use the command ```. build_ubuntu_20.sh``` to build the project. 
+
+Run code using ```. run.sh <solver_name> <map_name> <animation_speed> (optional to save animation)``` 
+
+(This requires python 3.9 or later, if you have a lower version of python, please use ```. run_python3.8.sh <solver_name> <map_name> <animation_speed>``` to run your code)
 
 Some examples commands are shown below:
 
